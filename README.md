@@ -45,8 +45,12 @@ NEXT_PUBLIC_WA_SETTER=5215587654321
 | `GHL_PIT` | Private Integration Token de GoHighLevel. **Secreto.** | `pit-xxxx...` |
 | `GHL_LOCATION_ID` | ID de la sub-cuenta (location) de GHL | `abc123...` |
 | `GHL_ENABLED` | `true` para enviar de verdad, `false` para solo loguear | `false` |
-| `NEXT_PUBLIC_WA_CLOSER` | WhatsApp del closer (leads tier **alto**) | `5215512345678` |
-| `NEXT_PUBLIC_WA_SETTER` | WhatsApp del setter (leads tier **medio**) | `5215587654321` |
+| `NEXT_PUBLIC_WA_CLOSER` | WhatsApp del closer (leads tier **alto**) | `522213454952` |
+| `NEXT_PUBLIC_WA_SETTER` | WhatsApp del setter (tier **medio** y **bajo**) | `522213454952` |
+
+> Hoy las dos apuntan al mismo número (el del setter), porque todavía no hay
+> uno de closer. Cuando lo haya, se cambia `NEXT_PUBLIC_WA_CLOSER` en Vercel y
+> los leads tier alto empiezan a caer ahí solos. No hay que tocar código.
 
 > El token **nunca** lleva el prefijo `NEXT_PUBLIC_`. Todo lo que lleva ese
 > prefijo queda visible en el navegador de cualquier visitante.
