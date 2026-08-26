@@ -87,7 +87,35 @@ Copia ese bloque y reemplaza con él el `ghlCustomFieldIds` que está al final d
 [`config/quiz.ts`](config/quiz.ts). Los campos que quedan con id vacío
 simplemente no se envían, así que nada se rompe si lo dejas a medias.
 
-Solo hace falta correrlo una vez, o cuando agregues preguntas nuevas.
+Solo hace falta correrlo una vez, o cuando agregues preguntas nuevas. **Ya está
+corrido** contra la cuenta "Mario YT": los 11 ids están puestos en la config.
+
+### Campos reusados de la cuenta
+
+Tres preguntas del quiz coinciden exactamente con campos que la cuenta ya tenía,
+así que se reusan en vez de duplicarlos y las automatizaciones que ya los leen
+siguen funcionando:
+
+| Pregunta del quiz | Campo en GoHighLevel | Tipo |
+| --- | --- | --- |
+| Q4 · manejo del ordenador | *¿Tienes experiencia con el ordenador y manejo de programas?* | RADIO |
+| Q5 · inversión | *¿Cuánto estarías dispuesto a invertir en ti mismo...?* | RADIO |
+| Q8 · compromiso | *Solo trabajamos con personas comprometidas...* | RADIO |
+
+Los campos RADIO de GoHighLevel **solo aceptan sus propias opciones, escritas
+tal cual** (con sus tildes y sus rarezas). Por eso esas tres preguntas tienen un
+`ghlValue` en cada opción dentro de [`config/quiz.ts`](config/quiz.ts):
+
+```ts
+{ id: "si", label: "Sí, me comprometo al 100%", ghlValue: "Si, me comprometo al 100%" },
+        ↑ lo que ve el visitante          ↑ lo que espera el CRM (sin tilde)
+```
+
+> El `label` se puede cambiar libremente. El `ghlValue` **no**, salvo que
+> cambies también la opción dentro de GoHighLevel. Si no coinciden, GHL
+> descarta el dato en silencio.
+
+Las otras 8 preguntas usan campos nuevos con el prefijo `Quiz - `.
 
 ---
 

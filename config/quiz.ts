@@ -503,30 +503,31 @@ export const summaryLabels: Record<string, string> = {
 /**
  * IDs de los custom fields de GoHighLevel.
  *
- * Los campos con id vacío ("") simplemente no se envían: la app sigue
- * funcionando igual. Para llenarlos corre `npm run ghl:setup` y pega aquí lo
- * que imprime.
+ * Ya están todos mapeados contra la cuenta "Mario YT". Si agregas preguntas
+ * nuevas, corre `npm run ghl:setup` y pega aquí lo que imprime.
  *
- * Los tres que ya tienen id son campos que YA EXISTÍAN en la cuenta y que
- * hacen exactamente la misma pregunta, así que se reusan en vez de duplicarlos
- * (las automatizaciones que ya los leen siguen funcionando). Como son de tipo
- * RADIO, sus opciones se mandan con el `ghlValue` de cada respuesta.
+ * Los marcados como REUSADO son campos que YA EXISTÍAN en la cuenta y hacen
+ * exactamente la misma pregunta, así que se reusan en vez de duplicarlos: las
+ * automatizaciones que ya los leen siguen funcionando. Como son de tipo RADIO,
+ * sus opciones se mandan con el `ghlValue` de cada respuesta.
+ *
+ * Un campo con id vacío ("") simplemente no se envía; la app sigue igual.
  */
 export const ghlCustomFieldIds: Record<string, string> = {
-  q1_estado: "",
-  q2_ocupacion: "",
-  q3_tiempo: "",
-  // "¿Tienes experiencia con el ordenador y manejo de programas?" (RADIO)
+  q1_estado: "6f6JApE17f9MsWLMGLIy",
+  q2_ocupacion: "O8PNgudsSLxvallFHn2Y",
+  q3_tiempo: "3rhK1zqbKhUGFMWO2JQi",
+  // REUSADO — "¿Tienes experiencia con el ordenador y manejo de programas?" (RADIO)
   q4_tecnica: "gFAmaTxEPGg2o7m4RQBO",
-  // "¿Cuánto estarías dispuesto a invertir en ti mismo...?" (RADIO)
+  // REUSADO — "¿Cuánto estarías dispuesto a invertir en ti mismo...?" (RADIO)
   q5_inversion: "fIF93MWmT8pKyJeY4WO6",
-  q6_ingreso: "",
-  q7_urgencia: "",
-  // "Solo trabajamos con personas comprometidas..." (RADIO)
+  q6_ingreso: "wdIcswyNflXj5MJca0ar",
+  q7_urgencia: "kBeC26GaWJWiYsCws6jZ",
+  // REUSADO — "Solo trabajamos con personas comprometidas..." (RADIO)
   q8_compromiso: "xWmqNPiGd0f2Z40IHNCG",
-  quiz_score: "",
-  quiz_tier: "",
-  yt_channel: "",
+  quiz_score: "qHcsZO6bEC5CeSEDoZ4A",
+  quiz_tier: "XAbjrV47eUfuo5QA2TbQ",
+  yt_channel: "XSDRSUfE5iud1WHfjuys",
 };
 
 /** Prefijo de los tags que se mandan a GHL. */
