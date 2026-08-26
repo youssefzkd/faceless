@@ -8,8 +8,12 @@
  *
  * Uso:  npm run ghl:setup      (lee GHL_PIT y GHL_LOCATION_ID de .env)
  */
-import "dotenv/config";
-import { questions, summaryLabels } from "../config/quiz";
+import { config } from "dotenv";
+import { ghlCustomFieldIds, questions, summaryLabels } from "../config/quiz";
+
+// Next.js usa .env.local; dotenv por defecto solo lee .env. Cargamos los dos.
+config({ path: ".env.local" });
+config({ path: ".env" });
 
 const BASE_URL = "https://services.leadconnectorhq.com";
 const API_VERSION = "2021-07-28";
@@ -75,6 +79,15 @@ async function main() {
   const map: Record<string, string> = {};
 
   for (const required of REQUIRED_FIELDS) {
+    // Campos ya mapeados a mano en la config (reusados de la cuenta): no se tocan.
+    const alreadyMapped = ghlCustomFieldIds[required.key];
+    if (alreadyMapped) {
+      map[required.key] = alreadyMapped;
+      const name = existing.find((f) => f.id === alreadyMapped)?.name ?? "(id fijado a mano)";
+      console.log(`↻ reusado:   ${name}`);
+      continue;
+    }
+
     const match = existing.find((f) => f.name === required.name);
 
     if (match) {

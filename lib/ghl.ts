@@ -33,8 +33,9 @@ function buildCustomFields(lead: LeadPayload, score: ScoreResult): CustomField[]
   for (const question of questions) {
     const optionId = lead.answers[question.id];
     if (!optionId) continue;
-    values[question.id] =
-      question.options.find((o) => o.id === optionId)?.label ?? optionId;
+    const option = question.options.find((o) => o.id === optionId);
+    // Los campos RADIO de GHL solo aceptan sus propias opciones, tal cual.
+    values[question.id] = option?.ghlValue ?? option?.label ?? optionId;
   }
 
   // Los custom fields van por ID, nunca por nombre.

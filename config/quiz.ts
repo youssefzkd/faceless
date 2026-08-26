@@ -23,8 +23,17 @@ export type Tier = "alto" | "medio" | "bajo";
 export type QuestionOption = {
   /** No cambiar nunca. Se usa en puntajes y en GoHighLevel. */
   id: string;
-  /** Texto visible para el usuario. Editable. */
+  /** Texto visible para el usuario. Editable libremente. */
   label: string;
+  /**
+   * Valor EXACTO que espera GoHighLevel, cuando el campo reusado es de tipo
+   * RADIO / SINGLE_OPTIONS. Esos campos solo aceptan sus opciones tal cual
+   * están escritas allá (con sus tildes y sus rarezas), si no descartan el
+   * dato. Si se omite, se manda el `label`.
+   *
+   * ⚠️ No lo toques salvo que cambies la opción en GoHighLevel también.
+   */
+  ghlValue?: string;
 };
 
 export type Question = {
@@ -195,9 +204,13 @@ export const questions: Question[] = [
     title: "¿Tienes experiencia con el ordenador y manejo de programas?",
     note: "Ojo, esto es muy importante para nosotros (hablamos de experiencia con el ordenador, no con YouTube)",
     options: [
-      { id: "bastante", label: "Bastante" },
-      { id: "algo", label: "Algo de soltura (aunque nunca haya hecho esto)" },
-      { id: "nada", label: "No, no sé hacer nada" },
+      { id: "bastante", label: "Bastante", ghlValue: "Bastante" },
+      {
+        id: "algo",
+        label: "Algo de soltura (aunque nunca haya hecho esto)",
+        ghlValue: "Algo de soltura (aunque nunca haya hecho esto)",
+      },
+      { id: "nada", label: "No, no sé hacer nada", ghlValue: "No, no se hacer nada" },
     ],
   },
   {
@@ -205,10 +218,27 @@ export const questions: Question[] = [
     title: "¿Cuánto estarías dispuesto a invertir en ti mismo para conseguir resultados?",
     note: "Esto no es el precio final de nuestros servicios.",
     options: [
-      { id: "2000_3000", label: "Dispongo entre 2000€-3000€" },
-      { id: "1000_2000", label: "Dispongo entre 1000€-2000€" },
-      { id: "300_500", label: "Dispongo entre +300-500€" },
-      { id: "menos_250", label: "Dispongo de menos de 250€ y me es imposible conseguirlos" },
+      {
+        id: "2000_3000",
+        label: "Dispongo entre 2000€-3000€",
+        ghlValue: "Dispongo entre 2000€-3000€ para invertir",
+      },
+      {
+        id: "1000_2000",
+        label: "Dispongo entre 1000€-2000€",
+        ghlValue: "Dispongo entre 1000-2000€ para invertir",
+      },
+      {
+        id: "300_500",
+        label: "Dispongo entre +300-500€",
+        ghlValue: "Dispongo entre +300-500€ para invertir",
+      },
+      {
+        id: "menos_250",
+        label: "Dispongo de menos de 250€ y me es imposible conseguirlos",
+        ghlValue:
+          "Dispongo de menos de 250€ para invertir ahora mismo y me es imposible conseguirlos",
+      },
     ],
   },
   {
@@ -236,8 +266,12 @@ export const questions: Question[] = [
     title:
       "Solo trabajamos con personas comprometidas. ¿Puedes garantizar que asistirás a la llamada en la fecha y hora que elijas, en un sitio adecuado? (ni en el coche, ni en la calle)",
     options: [
-      { id: "si", label: "Sí, me comprometo al 100%" },
-      { id: "no", label: "No puedo comprometerme a asistir" },
+      { id: "si", label: "Sí, me comprometo al 100%", ghlValue: "Si, me comprometo al 100%" },
+      {
+        id: "no",
+        label: "No puedo comprometerme a asistir",
+        ghlValue: "No puedo comprometerme a asistir",
+      },
     ],
   },
 ];
@@ -466,15 +500,30 @@ export const summaryLabels: Record<string, string> = {
  * Se rellenan corriendo `npm run ghl:setup` y pegando aquí lo que imprime.
  * Los campos con id vacío simplemente no se envían.
  */
+/**
+ * IDs de los custom fields de GoHighLevel.
+ *
+ * Los campos con id vacío ("") simplemente no se envían: la app sigue
+ * funcionando igual. Para llenarlos corre `npm run ghl:setup` y pega aquí lo
+ * que imprime.
+ *
+ * Los tres que ya tienen id son campos que YA EXISTÍAN en la cuenta y que
+ * hacen exactamente la misma pregunta, así que se reusan en vez de duplicarlos
+ * (las automatizaciones que ya los leen siguen funcionando). Como son de tipo
+ * RADIO, sus opciones se mandan con el `ghlValue` de cada respuesta.
+ */
 export const ghlCustomFieldIds: Record<string, string> = {
   q1_estado: "",
   q2_ocupacion: "",
   q3_tiempo: "",
-  q4_tecnica: "",
-  q5_inversion: "",
+  // "¿Tienes experiencia con el ordenador y manejo de programas?" (RADIO)
+  q4_tecnica: "gFAmaTxEPGg2o7m4RQBO",
+  // "¿Cuánto estarías dispuesto a invertir en ti mismo...?" (RADIO)
+  q5_inversion: "fIF93MWmT8pKyJeY4WO6",
   q6_ingreso: "",
   q7_urgencia: "",
-  q8_compromiso: "",
+  // "Solo trabajamos con personas comprometidas..." (RADIO)
+  q8_compromiso: "xWmqNPiGd0f2Z40IHNCG",
   quiz_score: "",
   quiz_tier: "",
   yt_channel: "",
