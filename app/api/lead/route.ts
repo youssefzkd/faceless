@@ -53,6 +53,14 @@ export async function POST(request: Request) {
   const message = buildMessage(clean, contact.name);
   const number = outcome.kind === "whatsapp" ? (outcome.number ?? "") : "";
 
+  if (outcome.kind === "whatsapp" && !number) {
+    // Sin número configurado el lead queda sin destino: hay que verlo en logs.
+    console.error(
+      `[lead] tier "${score.tier}" apunta a WhatsApp pero el número está vacío. ` +
+        "Revisa NEXT_PUBLIC_WA_CLOSER / NEXT_PUBLIC_WA_SETTER en Vercel.",
+    );
+  }
+
   return NextResponse.json({
     tier: score.tier,
     kind: number ? outcome.kind : "thankyou",

@@ -92,7 +92,7 @@ export const copy = {
 
   /** Texto legal en letra pequeña al pie. */
   legal:
-    "Al dejar tus datos aceptás que Arcadia se ponga en contacto con vos por teléfono, mensaje o email usando la información ingresada. No vendemos tu información personal. Al enviar el formulario aceptás nuestra Política de Privacidad y nuestros Términos de Servicio.",
+    "Al dejar tus datos aceptás que Mario Ruiz se ponga en contacto con vos por teléfono, mensaje o email usando la información ingresada. No vendemos tu información personal. Al enviar el formulario aceptás nuestra Política de Privacidad y nuestros Términos de Servicio.",
 
   /** Pantalla de datos de contacto (después de la pregunta 8). */
   contact: {
@@ -433,12 +433,26 @@ export const outcomes: Record<
     previewFootnote: "Solamente hacé clic en enviar en WhatsApp",
     privacyNote: "🔒 Privacidad de datos",
   },
+  /**
+   * Los tres tiers terminan en WhatsApp con el mensaje ya escrito. Lo que
+   * cambia es a QUÉ número llega: alto va al closer, medio y bajo al setter.
+   *
+   * Si algún día querés que el tier bajo NO llegue a WhatsApp, cambiá `kind`
+   * a "thankyou" y poné el link de descarga en `resourceUrl`.
+   */
   bajo: {
-    kind: "thankyou",
-    title: "Gracias. Aquí está tu acceso.",
-    subtitle:
-      "Por ahora este es el mejor punto de partida para ti. Descárgalo y empieza hoy mismo.",
-    resourceUrl: "https://example.com/recurso",
+    kind: "whatsapp",
+    number: waNumbers.setter,
+    eyebrow: "Solo falta un paso",
+    title: "Abrí WhatsApp",
+    subtitle: "Para enviarte el sistema de canal faceless, abrí tu WhatsApp.",
+    subtitleStrong: "El mensaje ya está escrito, solo hacé clic en enviar.",
+    cta: "Recibir mi sistema por WhatsApp",
+    countdown: "Abriendo WhatsApp en {seconds} segundos...",
+    previewLabel: "Vista previa del mensaje",
+    previewFootnote: "Solamente hacé clic en enviar en WhatsApp",
+    privacyNote: "🔒 Privacidad de datos",
+    resourceUrl: "",
     resourceCta: "Descargar el sistema",
   },
 };
