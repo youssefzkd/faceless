@@ -25,4 +25,6 @@ export type ScoreResult = {
   /** Bloqueo principal detectado (para tag y contexto del closer). */
   blocker: string;
   hardFiltered: boolean;
+  /** true = se le muestra la pantalla de rechazo, sin WhatsApp. */
+  rejected: boolean;
 };

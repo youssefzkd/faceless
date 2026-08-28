@@ -69,7 +69,23 @@ export const brand = {
  * Cámbialo aquí UNA sola vez y se actualiza en todos los lugares donde
  * aparece (el pill de arriba y los bullets del final).
  */
-export const socialProofCount = "+2.400";
+export const socialProofCount = "+360";
+
+/**
+ * Fotos de perfil del pill de prueba social (las 3 caritas de la izquierda).
+ *
+ * Vacío ([]) = se dibujan círculos rojos, que es lo que se ve hoy.
+ * Para poner fotos reales: sube los archivos a la carpeta `public/` del repo y
+ * escríbelos aquí. Se recortan en círculo solas, así que da igual el tamaño,
+ * pero cuadradas quedan mejor.
+ *
+ *   export const socialProofAvatars: Resource[] = [
+ *     { src: "/avatars/1.jpg", alt: "" },
+ *     { src: "/avatars/2.jpg", alt: "" },
+ *     { src: "/avatars/3.jpg", alt: "" },
+ *   ];
+ */
+export const socialProofAvatars: Resource[] = [];
 
 /** Reemplaza {count} por socialProofCount en cualquier texto. */
 export function withCount(text: string): string {
@@ -78,21 +94,21 @@ export function withCount(text: string): string {
 
 export const copy = {
   /** Pill de prueba social arriba del todo. {count} = socialProofCount */
-  socialProof: "{count} canales lanzados",
+  socialProof: "{count} recursos entregados",
 
   /** Titular en 3 líneas. La tercera va en rojo. */
   headline: {
     line1: "Recibe gratis el sistema",
-    line2: "de canal faceless",
-    accent: "en menos de 60 segundos",
+    line2: "de canal faceless de Nextube",
+    accent: "con el que han monetizado +300 canales de Youtube",
   },
 
   /** Bullets con check al pie de la página. {count} = socialProofCount */
-  closingBullets: ["Acceso inmediato, sin costo", "{count} personas ya lo tienen"],
+  closingBullets: ["Acceso inmediato, sin coste", "{count} personas ya lo tienen"],
 
   /** Texto legal en letra pequeña al pie. */
   legal:
-    "Al dejar tus datos aceptás que Mario Ruiz se ponga en contacto con vos por teléfono, mensaje o email usando la información ingresada. No vendemos tu información personal. Al enviar el formulario aceptás nuestra Política de Privacidad y nuestros Términos de Servicio.",
+    "Al dejar tus datos aceptas que NextCreator SLU se ponga en contacto contigo por teléfono, mensaje o email usando la información introducida. No vendemos tu información personal. Al enviar el formulario aceptas nuestra Política de Privacidad y nuestros Términos de Servicio.",
 
   /** Pantalla de datos de contacto (después de la pregunta 8). */
   contact: {
@@ -191,7 +207,7 @@ export const questions: Question[] = [
   },
   {
     id: "q3_tiempo",
-    title: "¿Cuánto tiempo puedes dedicarle a la semana?",
+    title: "¿Cuánto tiempo puedes dedicarle a YouTube a la semana?",
     options: [
       { id: "menos_5", label: "Menos de 5 horas" },
       { id: "5_10", label: "Entre 5 y 10 horas" },
@@ -235,20 +251,10 @@ export const questions: Question[] = [
       },
       {
         id: "menos_250",
-        label: "Dispongo de menos de 250€ y me es imposible conseguirlos",
+        label: "Dispongo de menos de 250€",
         ghlValue:
           "Dispongo de menos de 250€ para invertir ahora mismo y me es imposible conseguirlos",
       },
-    ],
-  },
-  {
-    id: "q6_ingreso",
-    title: "¿De dónde viene tu ingreso principal hoy?",
-    options: [
-      { id: "sueldo_fijo", label: "Sueldo fijo" },
-      { id: "variable", label: "Ingresos variables o comisiones" },
-      { id: "negocio", label: "Negocio propio" },
-      { id: "sin_ingreso", label: "Sin ingreso estable ahora" },
     ],
   },
   {
@@ -293,7 +299,7 @@ export const showChannelFieldWhen = {
  *
  * Peso alto:  q5 (presupuesto) y q3 (tiempo)  → hasta 30 pts
  * Peso medio: q7 (urgencia)                   → hasta 15 pts
- * Peso bajo:  q1, q2, q6                      → hasta 8 pts
+ * Peso bajo:  q1, q2                          → hasta 8 pts
  */
 export const scoreWeights: Record<string, Record<string, number>> = {
   q1_estado: {
@@ -326,12 +332,6 @@ export const scoreWeights: Record<string, Record<string, number>> = {
     "300_500": 10,
     menos_250: 0,
   },
-  q6_ingreso: {
-    sueldo_fijo: 8,
-    variable: 6,
-    negocio: 7,
-    sin_ingreso: 1,
-  },
   q7_urgencia: {
     "30_dias": 15,
     "3_meses": 11,
@@ -348,7 +348,16 @@ export const scoreWeights: Record<string, Record<string, number>> = {
  * Filtros duros: si el usuario elige una de estas opciones, el tier baja a
  * "bajo" sin importar el puntaje total.
  */
-export const hardFilters: { questionId: string; optionId: string; reason: string }[] = [
+export const hardFilters: {
+  questionId: string;
+  optionId: string;
+  reason: string;
+  /**
+   * true = además de bajar a tier bajo, se le muestra la pantalla de rechazo
+   * y NO se le da acceso a WhatsApp.
+   */
+  reject?: boolean;
+}[] = [
   {
     questionId: "q4_tecnica",
     optionId: "nada",
@@ -358,18 +367,30 @@ export const hardFilters: { questionId: string; optionId: string; reason: string
     questionId: "q8_compromiso",
     optionId: "no",
     reason: "No se compromete a asistir",
+    reject: true,
   },
 ];
 
 /**
- * Umbrales de puntaje. Puntaje máximo posible: 119.
+ * Pantalla final para quien cae en un filtro con `reject: true`.
+ * No lleva botón: es un cierre, no un paso más.
+ */
+export const rejectionScreen = {
+  eyebrow: "Gracias por tu sinceridad",
+  title: "Lo lamentamos",
+  subtitle:
+    "Únicamente trabajamos con personas que sí están comprometidas. Si en otro momento puedes comprometerte de verdad, vuelve a rellenar el formulario y lo vemos.",
+} as const;
+
+/**
+ * Umbrales de puntaje. Puntaje máximo posible: 111.
  *  >= alto  → tier alto
  *  >= medio → tier medio
  *  resto    → tier bajo
  */
 export const tierThresholds = {
-  alto: 88,
-  medio: 55,
+  alto: 82,
+  medio: 51,
 } as const;
 
 /* --------------------------------------------------- destino según tier --- */
@@ -411,46 +432,46 @@ export const outcomes: Record<
     kind: "whatsapp",
     number: waNumbers.closer,
     eyebrow: "Solo falta un paso",
-    title: "Abrí WhatsApp",
-    subtitle: "Para enviarte el sistema de canal faceless, abrí tu WhatsApp.",
-    subtitleStrong: "El mensaje ya está escrito, solo hacé clic en enviar.",
+    title: "Abre WhatsApp",
+    subtitle: "Para enviarte el sistema de canal faceless, abre tu WhatsApp.",
+    subtitleStrong: "El mensaje ya está escrito, solo tienes que darle a enviar.",
     cta: "Recibir mi sistema por WhatsApp",
     countdown: "Abriendo WhatsApp en {seconds} segundos...",
     previewLabel: "Vista previa del mensaje",
-    previewFootnote: "Solamente hacé clic en enviar en WhatsApp",
+    previewFootnote: "Solamente tienes que darle a enviar en WhatsApp",
     privacyNote: "🔒 Privacidad de datos",
   },
   medio: {
     kind: "whatsapp",
     number: waNumbers.setter,
     eyebrow: "Solo falta un paso",
-    title: "Abrí WhatsApp",
-    subtitle: "Para enviarte el sistema de canal faceless, abrí tu WhatsApp.",
-    subtitleStrong: "El mensaje ya está escrito, solo hacé clic en enviar.",
+    title: "Abre WhatsApp",
+    subtitle: "Para enviarte el sistema de canal faceless, abre tu WhatsApp.",
+    subtitleStrong: "El mensaje ya está escrito, solo tienes que darle a enviar.",
     cta: "Recibir mi sistema por WhatsApp",
     countdown: "Abriendo WhatsApp en {seconds} segundos...",
     previewLabel: "Vista previa del mensaje",
-    previewFootnote: "Solamente hacé clic en enviar en WhatsApp",
+    previewFootnote: "Solamente tienes que darle a enviar en WhatsApp",
     privacyNote: "🔒 Privacidad de datos",
   },
   /**
    * Los tres tiers terminan en WhatsApp con el mensaje ya escrito. Lo que
    * cambia es a QUÉ número llega: alto va al closer, medio y bajo al setter.
    *
-   * Si algún día querés que el tier bajo NO llegue a WhatsApp, cambiá `kind`
+   * Si algún día quieres que el tier bajo NO llegue a WhatsApp, cambia `kind`
    * a "thankyou" y poné el link de descarga en `resourceUrl`.
    */
   bajo: {
     kind: "whatsapp",
     number: waNumbers.setter,
     eyebrow: "Solo falta un paso",
-    title: "Abrí WhatsApp",
-    subtitle: "Para enviarte el sistema de canal faceless, abrí tu WhatsApp.",
-    subtitleStrong: "El mensaje ya está escrito, solo hacé clic en enviar.",
+    title: "Abre WhatsApp",
+    subtitle: "Para enviarte el sistema de canal faceless, abre tu WhatsApp.",
+    subtitleStrong: "El mensaje ya está escrito, solo tienes que darle a enviar.",
     cta: "Recibir mi sistema por WhatsApp",
     countdown: "Abriendo WhatsApp en {seconds} segundos...",
     previewLabel: "Vista previa del mensaje",
-    previewFootnote: "Solamente hacé clic en enviar en WhatsApp",
+    previewFootnote: "Solamente tienes que darle a enviar en WhatsApp",
     privacyNote: "🔒 Privacidad de datos",
     resourceUrl: "",
     resourceCta: "Descargar el sistema",
@@ -502,7 +523,6 @@ export const summaryLabels: Record<string, string> = {
   q3_tiempo: "Tiempo semanal",
   q4_tecnica: "Manejo del ordenador",
   q5_inversion: "Inversión disponible",
-  q6_ingreso: "Ingreso principal",
   q7_urgencia: "Plazo",
   q8_compromiso: "Compromiso",
 };
@@ -535,7 +555,6 @@ export const ghlCustomFieldIds: Record<string, string> = {
   q4_tecnica: "gFAmaTxEPGg2o7m4RQBO",
   // REUSADO — "¿Cuánto estarías dispuesto a invertir en ti mismo...?" (RADIO)
   q5_inversion: "fIF93MWmT8pKyJeY4WO6",
-  q6_ingreso: "wdIcswyNflXj5MJca0ar",
   q7_urgencia: "kBeC26GaWJWiYsCws6jZ",
   // REUSADO — "Solo trabajamos con personas comprometidas..." (RADIO)
   q8_compromiso: "xWmqNPiGd0f2Z40IHNCG",
@@ -553,4 +572,4 @@ export const ghlTags = {
 } as const;
 
 /** País por defecto del selector de teléfono. */
-export const defaultPhoneCountry = "MX";
+export const defaultPhoneCountry = "ES";

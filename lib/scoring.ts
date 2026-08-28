@@ -43,6 +43,7 @@ export function scoreAnswers(answers: Answers): ScoreResult {
     tier,
     blocker: triggered[0]?.reason ?? weakestArea(answers),
     hardFiltered: triggered.length > 0,
+    rejected: triggered.some((f) => f.reject === true),
   };
 }
 

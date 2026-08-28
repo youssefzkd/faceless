@@ -60,7 +60,7 @@ export default function WhatsAppScreen({ tier, message, link }: Props) {
 
       <p className="mt-4 text-[13px] text-muted" aria-live="polite">
         {opened ? (
-          "Si no se abrió solo, tocá el botón de arriba."
+          "Si no se ha abierto solo, pulsa el botón de arriba."
         ) : (
           <Countdown template={outcome.countdown ?? ""} seconds={seconds} />
         )}

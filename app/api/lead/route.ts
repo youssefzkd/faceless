@@ -51,6 +51,12 @@ export async function POST(request: Request) {
   }
 
   const message = buildMessage(clean, contact.name);
+
+  // Un filtro con `reject` corta acá: ni WhatsApp ni recurso.
+  if (score.rejected) {
+    return NextResponse.json({ tier: score.tier, kind: "rechazo", message: "", link: "" });
+  }
+
   const number = outcome.kind === "whatsapp" ? (outcome.number ?? "") : "";
 
   if (outcome.kind === "whatsapp" && !number) {

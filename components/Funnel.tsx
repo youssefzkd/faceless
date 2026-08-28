@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 import {
   copy,
   heroResources,
   questions,
   showChannelFieldWhen,
+  socialProofAvatars,
   withCount,
   type Tier,
 } from "@/config/quiz";
@@ -15,13 +17,14 @@ import ContactStep from "./ContactStep";
 import HeroStack from "./HeroStack";
 import ProgressBar from "./ProgressBar";
 import QuestionStep from "./QuestionStep";
+import RejectionScreen from "./RejectionScreen";
 import ThankYouScreen from "./ThankYouScreen";
 import WhatsAppScreen from "./WhatsAppScreen";
 import { CheckIcon } from "./icons";
 
 type Outcome = {
   tier: Tier;
-  kind: "whatsapp" | "thankyou";
+  kind: "whatsapp" | "thankyou" | "rechazo";
   message: string;
   link: string;
 };
@@ -84,7 +87,9 @@ export default function Funnel() {
   if (outcome) {
     return (
       <main className="mx-auto flex w-full max-w-page flex-col px-5 pb-16 pt-14 sm:pt-20">
-        {outcome.kind === "whatsapp" ? (
+        {outcome.kind === "rechazo" ? (
+          <RejectionScreen />
+        ) : outcome.kind === "whatsapp" ? (
           <WhatsAppScreen
             tier={outcome.tier}
             message={outcome.message}
@@ -160,8 +165,29 @@ export default function Funnel() {
   );
 }
 
+/**
+ * Caritas del pill de prueba social. Con `socialProofAvatars` lleno usa esas
+ * fotos; vacío, dibuja los círculos rojos de siempre.
+ */
 function Avatars() {
   const shades = ["#A32D2D", "#801F1F", "#C25454"];
+
+  if (socialProofAvatars.length > 0) {
+    return (
+      <span className="flex -space-x-1.5" aria-hidden="true">
+        {socialProofAvatars.map((avatar) => (
+          <Image
+            key={avatar.src}
+            src={avatar.src}
+            alt={avatar.alt}
+            width={36}
+            height={36}
+            className="h-[18px] w-[18px] rounded-full object-cover ring-2 ring-brand-soft"
+          />
+        ))}
+      </span>
+    );
+  }
 
   return (
     <span className="flex -space-x-1.5" aria-hidden="true">
