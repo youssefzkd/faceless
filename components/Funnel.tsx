@@ -5,8 +5,10 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import {
   copy,
+  hardFilters,
   heroResources,
   questions,
+  rejectImmediately,
   showChannelFieldWhen,
   socialProofAvatars,
   withCount,
@@ -50,6 +52,18 @@ export default function Funnel() {
 
   function selectOption(questionId: string, optionId: string) {
     setAnswers((prev) => ({ ...prev, [questionId]: optionId }));
+
+    // Si la respuesta descalifica, se corta acá mismo: no se le piden los datos.
+    const rejects = hardFilters.some(
+      (f) => f.reject && f.questionId === questionId && f.optionId === optionId,
+    );
+
+    if (rejectImmediately && rejects) {
+      setOutcome({ tier: "bajo", kind: "rechazo", message: "", link: "" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
     setStep((prev) => prev + 1);
   }
 

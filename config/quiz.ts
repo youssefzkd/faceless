@@ -207,12 +207,12 @@ export const questions: Question[] = [
   },
   {
     id: "q3_tiempo",
-    title: "¿Cuánto tiempo puedes dedicarle a YouTube a la semana?",
+    title: "¿Cuántas horas al día puedes dedicarle a YouTube?",
     options: [
-      { id: "menos_5", label: "Menos de 5 horas" },
-      { id: "5_10", label: "Entre 5 y 10 horas" },
-      { id: "10_20", label: "Entre 10 y 20 horas" },
-      { id: "mas_20", label: "Más de 20 horas" },
+      { id: "menos_1", label: "Menos de 1 hora" },
+      { id: "1_2", label: "Entre 1 y 2 horas" },
+      { id: "2_4", label: "Entre 2 y 4 horas" },
+      { id: "mas_4", label: "Más de 4 horas" },
     ],
   },
   {
@@ -316,10 +316,10 @@ export const scoreWeights: Record<string, Record<string, number>> = {
     sin_trabajo: 1,
   },
   q3_tiempo: {
-    menos_5: 0,
-    "5_10": 15,
-    "10_20": 25,
-    mas_20: 30,
+    menos_1: 0,
+    "1_2": 15,
+    "2_4": 25,
+    mas_4: 30,
   },
   q4_tecnica: {
     bastante: 10,
@@ -372,6 +372,15 @@ export const hardFilters: {
 ];
 
 /**
+ * ¿Un filtro con `reject: true` corta en el momento de responder?
+ *  true  → apenas elige esa opción ve la pantalla de rechazo. No se le piden
+ *          los datos ni llega a GoHighLevel.
+ *  false → termina el formulario y recién ahí ve el rechazo (el contacto sí
+ *          queda registrado en GoHighLevel, con su tag de bloqueo).
+ */
+export const rejectImmediately = true;
+
+/**
  * Pantalla final para quien cae en un filtro con `reject: true`.
  * No lleva botón: es un cierre, no un paso más.
  */
@@ -379,7 +388,7 @@ export const rejectionScreen = {
   eyebrow: "Gracias por tu sinceridad",
   title: "Lo lamentamos",
   subtitle:
-    "Únicamente trabajamos con personas que sí están comprometidas. Si en otro momento puedes comprometerte de verdad, vuelve a rellenar el formulario y lo vemos.",
+    "Únicamente trabajamos con personas comprometidas. Si más adelante puedes comprometerte de verdad, vuelve a rellenar el formulario y lo vemos.",
 } as const;
 
 /**
@@ -433,9 +442,9 @@ export const outcomes: Record<
     number: waNumbers.closer,
     eyebrow: "Solo falta un paso",
     title: "Abre WhatsApp",
-    subtitle: "Para enviarte el sistema de canal faceless, abre tu WhatsApp.",
+    subtitle: "Para enviarte el sistema de canales faceless, abre tu WhatsApp.",
     subtitleStrong: "El mensaje ya está escrito, solo tienes que darle a enviar.",
-    cta: "Recibir mi sistema por WhatsApp",
+    cta: "Recibir los recursos por WhatsApp",
     countdown: "Abriendo WhatsApp en {seconds} segundos...",
     previewLabel: "Vista previa del mensaje",
     previewFootnote: "Solamente tienes que darle a enviar en WhatsApp",
@@ -446,9 +455,9 @@ export const outcomes: Record<
     number: waNumbers.setter,
     eyebrow: "Solo falta un paso",
     title: "Abre WhatsApp",
-    subtitle: "Para enviarte el sistema de canal faceless, abre tu WhatsApp.",
+    subtitle: "Para enviarte el sistema de canales faceless, abre tu WhatsApp.",
     subtitleStrong: "El mensaje ya está escrito, solo tienes que darle a enviar.",
-    cta: "Recibir mi sistema por WhatsApp",
+    cta: "Recibir los recursos por WhatsApp",
     countdown: "Abriendo WhatsApp en {seconds} segundos...",
     previewLabel: "Vista previa del mensaje",
     previewFootnote: "Solamente tienes que darle a enviar en WhatsApp",
@@ -466,9 +475,9 @@ export const outcomes: Record<
     number: waNumbers.setter,
     eyebrow: "Solo falta un paso",
     title: "Abre WhatsApp",
-    subtitle: "Para enviarte el sistema de canal faceless, abre tu WhatsApp.",
+    subtitle: "Para enviarte el sistema de canales faceless, abre tu WhatsApp.",
     subtitleStrong: "El mensaje ya está escrito, solo tienes que darle a enviar.",
-    cta: "Recibir mi sistema por WhatsApp",
+    cta: "Recibir los recursos por WhatsApp",
     countdown: "Abriendo WhatsApp en {seconds} segundos...",
     previewLabel: "Vista previa del mensaje",
     previewFootnote: "Solamente tienes que darle a enviar en WhatsApp",
@@ -520,7 +529,7 @@ export const summaryLineTemplate = "• {pregunta}: {respuesta}";
 export const summaryLabels: Record<string, string> = {
   q1_estado: "Punto de partida",
   q2_ocupacion: "Ocupación",
-  q3_tiempo: "Tiempo semanal",
+  q3_tiempo: "Horas al día",
   q4_tecnica: "Manejo del ordenador",
   q5_inversion: "Inversión disponible",
   q7_urgencia: "Plazo",
@@ -550,6 +559,7 @@ export const summaryLabels: Record<string, string> = {
 export const ghlCustomFieldIds: Record<string, string> = {
   q1_estado: "6f6JApE17f9MsWLMGLIy",
   q2_ocupacion: "O8PNgudsSLxvallFHn2Y",
+  // "Quiz - Horas al día"
   q3_tiempo: "3rhK1zqbKhUGFMWO2JQi",
   // REUSADO — "¿Tienes experiencia con el ordenador y manejo de programas?" (RADIO)
   q4_tecnica: "gFAmaTxEPGg2o7m4RQBO",
