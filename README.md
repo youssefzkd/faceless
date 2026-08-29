@@ -8,6 +8,9 @@ agradecimiento. Los leads se envían a **GoHighLevel**. No hay base de datos.
 - Deploy en Vercel
 - **Todo el contenido editable vive en un solo archivo: [`config/quiz.ts`](config/quiz.ts)**
 
+> **¿Vas a entregarle el proyecto al cliente?** Está todo en
+> [ENTREGA.md](ENTREGA.md).
+
 ---
 
 ## Cómo correr el proyecto en tu computadora
