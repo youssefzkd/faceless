@@ -11,6 +11,9 @@ import {
   rejectImmediately,
   showChannelFieldWhen,
   socialProofAvatars,
+  socialProofCount,
+  socialProofCountIntervalMs,
+  socialProofCountStep,
   withCount,
   type Tier,
 } from "@/config/quiz";
@@ -49,6 +52,20 @@ export default function Funnel() {
     const src = searchParams.get("src");
     if (src) setSource(src.trim().slice(0, 40));
   }, [searchParams]);
+
+  // El número del pill de prueba social sube solo mientras la persona
+  // está en la página (ver socialProofCountStep / socialProofCountIntervalMs).
+  const countPrefix = socialProofCount.match(/^\D*/)?.[0] ?? "";
+  const [liveCount, setLiveCount] = useState(
+    () => parseInt(socialProofCount.replace(/\D/g, ""), 10) || 0,
+  );
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setLiveCount((prev) => prev + socialProofCountStep);
+    }, socialProofCountIntervalMs);
+    return () => clearInterval(id);
+  }, []);
 
   function selectOption(questionId: string, optionId: string) {
     setAnswers((prev) => ({ ...prev, [questionId]: optionId }));
@@ -102,7 +119,7 @@ export default function Funnel() {
     return (
       <main className="mx-auto flex w-full max-w-page flex-col px-5 pb-16 pt-14 sm:pt-20">
         {outcome.kind === "rechazo" ? (
-          <RejectionScreen />
+          <RejectionScreen onBack={() => setOutcome(null)} />
         ) : outcome.kind === "whatsapp" ? (
           <WhatsAppScreen
             tier={outcome.tier}
@@ -120,7 +137,7 @@ export default function Funnel() {
     <main className="mx-auto flex w-full max-w-page flex-col items-center px-5 pb-16 pt-10 sm:pt-14">
       <span className="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3.5 py-1.5 text-[13px] text-brand-deep">
         <Avatars />
-        {withCount(copy.socialProof)}
+        {withCount(copy.socialProof, `${countPrefix}${liveCount}`)}
       </span>
 
       <h1 className="mt-6 text-center text-[30px] font-medium leading-[1.15] tracking-tight text-ink sm:text-[38px]">

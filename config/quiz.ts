@@ -85,11 +85,25 @@ export const socialProofCount = "+360";
  *     { src: "/avatars/3.jpg", alt: "" },
  *   ];
  */
-export const socialProofAvatars: Resource[] = [];
+export const socialProofAvatars: Resource[] = [
+  { src: "/avatars/1.jpg", alt: "" },
+  { src: "/avatars/2.avif", alt: "" },
+  { src: "/avatars/3.jpg", alt: "" },
+];
 
-/** Reemplaza {count} por socialProofCount en cualquier texto. */
-export function withCount(text: string): string {
-  return text.replace(/{count}/g, socialProofCount);
+/**
+ * El pill de arriba ("+360 recursos entregados") sube solo mientras la
+ * persona está en la página, para dar sensación de actividad en tiempo real.
+ * Sube de `socialProofCountStep` en `socialProofCountStep` cada
+ * `socialProofCountIntervalMs` milisegundos, empezando en `socialProofCount`.
+ * Los bullets del final no se mueven: se quedan fijos en `socialProofCount`.
+ */
+export const socialProofCountStep = 3;
+export const socialProofCountIntervalMs = 2000;
+
+/** Reemplaza {count} por socialProofCount (o por `countOverride` si se pasa). */
+export function withCount(text: string, countOverride?: string): string {
+  return text.replace(/{count}/g, countOverride ?? socialProofCount);
 }
 
 export const copy = {
@@ -99,8 +113,8 @@ export const copy = {
   /** Titular en 3 líneas. La tercera va en rojo. */
   headline: {
     line1: "Recibe gratis el sistema",
-    line2: "de canal faceless de Nextube",
-    accent: "con el que han monetizado +300 canales de Youtube",
+    line2: "de canales faceless de Nextube",
+    accent: "con el que se han monetizado +300 canales de YouTube",
   },
 
   /** Bullets con check al pie de la página. {count} = socialProofCount */
