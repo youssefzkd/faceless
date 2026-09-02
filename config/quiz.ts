@@ -153,10 +153,11 @@ export const copy = {
 } as const;
 
 /**
- * Imágenes del abanico del hero.
- * Déjalo vacío ([]) para usar el abanico dibujado por CSS (lo que se ve hoy).
- * Para usar imágenes reales: súbelas a /public y agrégalas aquí en orden,
- * de izquierda a derecha. Exactamente 5 entradas.
+ * Imágenes del abanico del hero, tarjeta por tarjeta.
+ * Solo se usa si `heroImage` (abajo) está vacío. Déjalo vacío ([]) para usar
+ * el abanico dibujado por CSS. Para usar 5 imágenes reales: súbelas a
+ * /public y agrégalas aquí en orden, de izquierda a derecha. Exactamente 5
+ * entradas.
  *
  * Ejemplo:
  *   export const heroResources: Resource[] = [
@@ -165,6 +166,16 @@ export const copy = {
  *   ];
  */
 export const heroResources: Resource[] = [];
+
+/**
+ * Imagen ÚNICA del abanico del hero (el fan de tarjetas ya armado en un solo
+ * archivo). Si tiene valor, se usa esta y se ignoran `heroResources` y el
+ * abanico dibujado por CSS. Para volver al abanico CSS, pon `null`.
+ */
+export const heroImage: Resource | null = {
+  src: "/hero/abanico.png",
+  alt: "Recurso Guiones virales, Nichos rentables, Dashboard con ingresos del mes, Plan de 30 días para monetizar un canal de YouTube, Prompts IA",
+};
 
 /**
  * Etiquetas de las tarjetas del abanico CSS (fallback sin imágenes).

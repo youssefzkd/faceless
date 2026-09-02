@@ -6,6 +6,7 @@ import Image from "next/image";
 import {
   copy,
   hardFilters,
+  heroImage,
   heroResources,
   questions,
   rejectImmediately,
@@ -141,7 +142,18 @@ export default function Funnel() {
       </h1>
 
       <div className="mt-6 w-full sm:mt-8">
-        <HeroStack resources={heroResources} />
+        {heroImage ? (
+          <Image
+            src={heroImage.src}
+            alt={heroImage.alt}
+            width={1600}
+            height={660}
+            priority
+            className="mx-auto h-auto w-full max-w-[620px]"
+          />
+        ) : (
+          <HeroStack resources={heroResources} />
+        )}
       </div>
 
       <section className="mt-8 w-full rounded-2xl border border-hairline bg-white p-5 sm:p-7">

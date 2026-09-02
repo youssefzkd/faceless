@@ -261,10 +261,17 @@ más simple y además abre la ventana de 24h de conversación.
 
 ### Cambiar el abanico del hero por imágenes reales
 
-Hoy el hero se dibuja 100% en CSS porque los assets del cliente aún no existen.
-Cuando existan: súbelas a la carpeta `public/` y llena `heroResources` en
-[`config/quiz.ts`](config/quiz.ts) con 5 entradas. Se renderizan en las mismas
-posiciones y rotaciones, sin tocar nada más.
+Hoy se usa una imagen real (`public/hero/abanico.png`) apuntada desde
+`heroImage` en [`config/quiz.ts`](config/quiz.ts): es el abanico entero ya
+armado en un solo archivo. Para cambiarla, sube el archivo nuevo a
+`public/hero/` y actualiza `heroImage.src`.
+
+Alternativas, si algún día hace falta:
+
+- **5 imágenes por separado** (una por tarjeta, con su rotación individual):
+  vacía `heroImage` (ponlo en `null`) y llena `heroResources` con 5 entradas.
+- **Abanico dibujado por CSS** (el que había antes de subir la imagen): deja
+  `heroImage` en `null` y `heroResources` vacío (`[]`).
 
 ### Si más adelante hay que cambiar de API a webhook
 
