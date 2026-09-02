@@ -267,21 +267,9 @@ export const questions: Question[] = [
     title: "¿Cuánto estarías dispuesto a invertir en ti mismo para conseguir resultados?",
     note: "Esto no es el precio final de nuestros servicios.",
     options: [
-      {
-        id: "2000_3000",
-        label: "1000-2000+€",
-        ghlValue: "1000-2000+€",
-      },
-      {
-        id: "1000_2000",
-        label: "500-1000€",
-        ghlValue: "500-1000€",
-      },
-      {
-        id: "300_500",
-        label: "300-500€",
-        ghlValue: "300-500€",
-      },
+      { id: "2000_3000", label: "1000-2000+€" },
+      { id: "1000_2000", label: "500-1000€" },
+      { id: "300_500", label: "300-500€" },
       {
         id: "menos_250",
         label: "Dispongo de menos de 250€",
@@ -519,8 +507,9 @@ export const ghlCustomFieldIds: Record<string, string> = {
   q3_tiempo: "3rhK1zqbKhUGFMWO2JQi",
   // REUSADO — "¿Tienes experiencia con el ordenador y manejo de programas?" (RADIO)
   q4_tecnica: "gFAmaTxEPGg2o7m4RQBO",
-  // REUSADO — "¿Cuánto estarías dispuesto a invertir en ti mismo...?" (RADIO)
-  q5_inversion: "fIF93MWmT8pKyJeY4WO6",
+  // "Quiz - Inversión disponible" (antes reusaba un campo RADIO compartido
+  // con otra automatización; se separó para no arriesgar esa otra cosa)
+  q5_inversion: "oZOnycmGDzPNhZAyDg8k",
   // REUSADO — "¿Eres una persona comprometida?" (RADIO)
   q8_compromiso: "xWmqNPiGd0f2Z40IHNCG",
   quiz_score: "qHcsZO6bEC5CeSEDoZ4A",

@@ -96,18 +96,17 @@ corrido** contra la cuenta "Mario YT": los ids están puestos en la config.
 
 ### Campos reusados de la cuenta
 
-Tres preguntas del quiz coinciden exactamente con campos que la cuenta ya tenía,
+Dos preguntas del quiz coinciden exactamente con campos que la cuenta ya tenía,
 así que se reusan en vez de duplicarlos y las automatizaciones que ya los leen
 siguen funcionando:
 
 | Pregunta del quiz | Campo en GoHighLevel | Tipo |
 | --- | --- | --- |
 | Q4 · manejo del ordenador | *¿Tienes experiencia con el ordenador y manejo de programas?* | RADIO |
-| Q5 · inversión | *¿Cuánto estarías dispuesto a invertir en ti mismo...?* | RADIO |
 | Q8 · compromiso | *¿Eres una persona comprometida?* | RADIO |
 
 Los campos RADIO de GoHighLevel **solo aceptan sus propias opciones, escritas
-tal cual** (con sus tildes y sus rarezas). Por eso esas tres preguntas tienen un
+tal cual** (con sus tildes y sus rarezas). Por eso esas dos preguntas tienen un
 `ghlValue` en cada opción dentro de [`config/quiz.ts`](config/quiz.ts):
 
 ```ts
@@ -119,7 +118,13 @@ tal cual** (con sus tildes y sus rarezas). Por eso esas tres preguntas tienen un
 > cambies también la opción dentro de GoHighLevel. Si no coinciden, GHL
 > descarta el dato en silencio.
 
-Las otras 3 preguntas usan campos nuevos con el prefijo `Quiz - `.
+> **Q5 · inversión ya NO es un campo reusado.** Al principio usaba un campo
+> RADIO viejo de la cuenta, pero ese campo lo lee otra automatización que no
+> tiene nada que ver con este quiz — cambiarle las opciones podía romperla.
+> Ahora tiene su propio campo nuevo, `Quiz - Inversión disponible` (tipo
+> texto libre, sin lista cerrada), igual que las demás preguntas nuevas.
+
+Las otras 4 preguntas usan campos nuevos con el prefijo `Quiz - `.
 
 ---
 
