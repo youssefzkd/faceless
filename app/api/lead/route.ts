@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { outcomes, questions } from "@/config/quiz";
+import { questions, waNumber } from "@/config/quiz";
 import { sendLead } from "@/lib/ghl";
 import { scoreAnswers } from "@/lib/scoring";
 import type { LeadPayload } from "@/lib/types";
@@ -43,7 +43,6 @@ export async function POST(request: Request) {
 
   // El scoring se calcula aquí, en el servidor. Nunca en el cliente.
   const score = scoreAnswers(clean);
-  const outcome = outcomes[score.tier];
 
   const result = await sendLead({ answers: clean, contact, source }, score);
   if (!result.ok) {
@@ -54,23 +53,17 @@ export async function POST(request: Request) {
 
   // Un filtro con `reject` corta acá: ni WhatsApp ni recurso.
   if (score.rejected) {
-    return NextResponse.json({ tier: score.tier, kind: "rechazo", message: "", link: "" });
+    return NextResponse.json({ kind: "rechazo", message: "", link: "" });
   }
 
-  const number = outcome.kind === "whatsapp" ? (outcome.number ?? "") : "";
-
-  if (outcome.kind === "whatsapp" && !number) {
+  if (!waNumber) {
     // Sin número configurado el lead queda sin destino: hay que verlo en logs.
-    console.error(
-      `[lead] tier "${score.tier}" apunta a WhatsApp pero el número está vacío. ` +
-        "Revisa NEXT_PUBLIC_WA_CLOSER / NEXT_PUBLIC_WA_SETTER en Vercel.",
-    );
+    console.error("[lead] Sin WhatsApp configurado. Revisa NEXT_PUBLIC_WA_CLOSER en Vercel.");
   }
 
   return NextResponse.json({
-    tier: score.tier,
-    kind: number ? outcome.kind : "thankyou",
+    kind: waNumber ? "whatsapp" : "thankyou",
     message,
-    link: number ? buildWhatsAppLink(number, message) : "",
+    link: waNumber ? buildWhatsAppLink(waNumber, message) : "",
   });
 }

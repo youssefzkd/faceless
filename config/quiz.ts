@@ -18,8 +18,6 @@
 
 /* ---------------------------------------------------------------- tipos --- */
 
-export type Tier = "alto" | "medio" | "bajo";
-
 export type QuestionOption = {
   /** No cambiar nunca. Se usa en puntajes y en GoHighLevel. */
   id: string;
@@ -85,11 +83,25 @@ export const socialProofCount = "+360";
  *     { src: "/avatars/3.jpg", alt: "" },
  *   ];
  */
-export const socialProofAvatars: Resource[] = [];
+export const socialProofAvatars: Resource[] = [
+  { src: "/avatars/1.jpg", alt: "" },
+  { src: "/avatars/2.avif", alt: "" },
+  { src: "/avatars/3.jpg", alt: "" },
+];
 
-/** Reemplaza {count} por socialProofCount en cualquier texto. */
-export function withCount(text: string): string {
-  return text.replace(/{count}/g, socialProofCount);
+/**
+ * El pill de arriba ("+360 recursos entregados") sube solo mientras la
+ * persona está en la página, para dar sensación de actividad en tiempo real.
+ * Sube de `socialProofCountStep` en `socialProofCountStep` cada
+ * `socialProofCountIntervalMs` milisegundos, empezando en `socialProofCount`.
+ * Los bullets del final no se mueven: se quedan fijos en `socialProofCount`.
+ */
+export const socialProofCountStep = 3;
+export const socialProofCountIntervalMs = 2000;
+
+/** Reemplaza {count} por socialProofCount (o por `countOverride` si se pasa). */
+export function withCount(text: string, countOverride?: string): string {
+  return text.replace(/{count}/g, countOverride ?? socialProofCount);
 }
 
 export const copy = {
@@ -99,12 +111,17 @@ export const copy = {
   /** Titular en 3 líneas. La tercera va en rojo. */
   headline: {
     line1: "Recibe gratis el sistema",
-    line2: "de canal faceless de Nextube",
-    accent: "con el que han monetizado +300 canales de Youtube",
+    line2: "de canales faceless de Nextube",
+    accent: "con el que se han monetizado +300 canales de YouTube",
   },
 
   /** Bullets con check al pie de la página. {count} = socialProofCount */
-  closingBullets: ["Acceso inmediato, sin coste", "{count} personas ya lo tienen"],
+  closingBullets: [
+    "Acceso inmediato, sin coste",
+    "{count} personas ya lo tienen",
+    "Recursos que usan alumnos de Nextube",
+    "Empieza con YouTube Faceless",
+  ],
 
   /** Texto legal en letra pequeña al pie. */
   legal:
@@ -136,10 +153,11 @@ export const copy = {
 } as const;
 
 /**
- * Imágenes del abanico del hero.
- * Déjalo vacío ([]) para usar el abanico dibujado por CSS (lo que se ve hoy).
- * Para usar imágenes reales: súbelas a /public y agrégalas aquí en orden,
- * de izquierda a derecha. Exactamente 5 entradas.
+ * Imágenes del abanico del hero, tarjeta por tarjeta.
+ * Solo se usa si `heroImage` (abajo) está vacío. Déjalo vacío ([]) para usar
+ * el abanico dibujado por CSS. Para usar 5 imágenes reales: súbelas a
+ * /public y agrégalas aquí en orden, de izquierda a derecha. Exactamente 5
+ * entradas.
  *
  * Ejemplo:
  *   export const heroResources: Resource[] = [
@@ -150,17 +168,32 @@ export const copy = {
 export const heroResources: Resource[] = [];
 
 /**
+ * Imagen ÚNICA del abanico del hero (el fan de tarjetas ya armado en un solo
+ * archivo). Si tiene valor, se usa esta y se ignoran `heroResources` y el
+ * abanico dibujado por CSS. Para volver al abanico CSS, pon `null`.
+ */
+export const heroImage: Resource | null = {
+  src: "/hero/abanico.png",
+  alt: "Recurso Guiones virales, Nichos rentables, Dashboard con ingresos del mes, Plan de 30 días para monetizar un canal de YouTube, Prompts IA",
+};
+
+/**
  * Etiquetas de las tarjetas del abanico CSS (fallback sin imágenes).
  * Orden: izquierda → derecha. La central es la del dashboard.
  */
 export const heroFallback = {
   /** Etiquetas de las 5 tarjetas, de izquierda a derecha. */
-  cards: ["Guion viral", "Nichos rentables", "Dashboard", "Plan 30 días", "Prompts IA"],
+  cards: [
+    "Recurso Guiones virales",
+    "Nichos rentables",
+    "Dashboard",
+    "Plan de 30 días para monetizar un canal de YouTube",
+    "Prompts IA",
+  ],
 
   /** Subtítulo opcional de una tarjeta lateral (la clave es su etiqueta). */
   side: {
     "Nichos rentables": "Base de 40",
-    "Plan 30 días": "4 semanas",
   } as Record<string, string>,
 
   /** Tarjeta central (la más grande). */
@@ -234,21 +267,9 @@ export const questions: Question[] = [
     title: "¿Cuánto estarías dispuesto a invertir en ti mismo para conseguir resultados?",
     note: "Esto no es el precio final de nuestros servicios.",
     options: [
-      {
-        id: "2000_3000",
-        label: "Dispongo entre 2000€-3000€",
-        ghlValue: "Dispongo entre 2000€-3000€ para invertir",
-      },
-      {
-        id: "1000_2000",
-        label: "Dispongo entre 1000€-2000€",
-        ghlValue: "Dispongo entre 1000-2000€ para invertir",
-      },
-      {
-        id: "300_500",
-        label: "Dispongo entre +300-500€",
-        ghlValue: "Dispongo entre +300-500€ para invertir",
-      },
+      { id: "2000_3000", label: "1000-2000+€" },
+      { id: "1000_2000", label: "500-1000€" },
+      { id: "300_500", label: "300-500€" },
       {
         id: "menos_250",
         label: "Dispongo de menos de 250€",
@@ -258,24 +279,13 @@ export const questions: Question[] = [
     ],
   },
   {
-    id: "q7_urgencia",
-    title: "¿Para cuándo quieres tener tu canal generando ingresos?",
-    options: [
-      { id: "30_dias", label: "En los próximos 30 días" },
-      { id: "3_meses", label: "En 3 meses" },
-      { id: "este_ano", label: "Este año" },
-      { id: "sin_prisa", label: "No tengo prisa" },
-    ],
-  },
-  {
     id: "q8_compromiso",
-    title:
-      "Solo trabajamos con personas comprometidas. ¿Puedes garantizar que asistirás a la llamada en la fecha y hora que elijas, en un sitio adecuado? (ni en el coche, ni en la calle)",
+    title: "¿Eres una persona comprometida?",
     options: [
       { id: "si", label: "Sí, me comprometo al 100%", ghlValue: "Si, me comprometo al 100%" },
       {
         id: "no",
-        label: "No puedo comprometerme a asistir",
+        label: "No soy una persona comprometida",
         ghlValue: "No puedo comprometerme a asistir",
       },
     ],
@@ -298,7 +308,6 @@ export const showChannelFieldWhen = {
  * Sube o baja los números para cambiar a quién califica el embudo.
  *
  * Peso alto:  q5 (presupuesto) y q3 (tiempo)  → hasta 30 pts
- * Peso medio: q7 (urgencia)                   → hasta 15 pts
  * Peso bajo:  q1, q2                          → hasta 8 pts
  */
 export const scoreWeights: Record<string, Record<string, number>> = {
@@ -332,12 +341,6 @@ export const scoreWeights: Record<string, Record<string, number>> = {
     "300_500": 10,
     menos_250: 0,
   },
-  q7_urgencia: {
-    "30_dias": 15,
-    "3_meses": 11,
-    este_ano: 5,
-    sin_prisa: 0,
-  },
   q8_compromiso: {
     si: 10,
     no: 0,
@@ -345,17 +348,16 @@ export const scoreWeights: Record<string, Record<string, number>> = {
 };
 
 /**
- * Filtros duros: si el usuario elige una de estas opciones, el tier baja a
- * "bajo" sin importar el puntaje total.
+ * Filtros duros: respuestas que marcan al lead como problemático. Solo
+ * cortan el paso (pantalla de rechazo, sin WhatsApp) si llevan
+ * `reject: true`; el resto quedan solo como dato (`reason`), sin efecto en
+ * el flujo — hoy no hay ninguno así, pero queda listo por si hace falta.
  */
 export const hardFilters: {
   questionId: string;
   optionId: string;
   reason: string;
-  /**
-   * true = además de bajar a tier bajo, se le muestra la pantalla de rechazo
-   * y NO se le da acceso a WhatsApp.
-   */
+  /** true = se le muestra la pantalla de rechazo y NO se le da acceso a WhatsApp. */
   reject?: boolean;
 }[] = [
   {
@@ -376,7 +378,7 @@ export const hardFilters: {
  *  true  → apenas elige esa opción ve la pantalla de rechazo. No se le piden
  *          los datos ni llega a GoHighLevel.
  *  false → termina el formulario y recién ahí ve el rechazo (el contacto sí
- *          queda registrado en GoHighLevel, con su tag de bloqueo).
+ *          queda registrado en GoHighLevel).
  */
 export const rejectImmediately = true;
 
@@ -391,101 +393,44 @@ export const rejectionScreen = {
     "Únicamente trabajamos con personas comprometidas. Si más adelante puedes comprometerte de verdad, vuelve a rellenar el formulario y lo vemos.",
 } as const;
 
+/* ------------------------------------------------ destino de todo lead --- */
+
 /**
- * Umbrales de puntaje. Puntaje máximo posible: 111.
- *  >= alto  → tier alto
- *  >= medio → tier medio
- *  resto    → tier bajo
+ * Ya no se reparte por tier: todo lead que pasa el quiz (y no cae en un
+ * filtro con `reject: true`) va al mismo número. Calificáis a mano por
+ * WhatsApp, así que aquí no hace falta distinguir closer/setter.
+ *
+ * `NEXT_PUBLIC_WA_SETTER` quedó sin usar — puedes borrarla de Vercel cuando
+ * quieras, no rompe nada si se queda.
  */
-export const tierThresholds = {
-  alto: 82,
-  medio: 51,
-} as const;
-
-/* --------------------------------------------------- destino según tier --- */
-
-export const waNumbers = {
-  closer: process.env.NEXT_PUBLIC_WA_CLOSER ?? "",
-  setter: process.env.NEXT_PUBLIC_WA_SETTER ?? "",
-} as const;
+export const waNumber = process.env.NEXT_PUBLIC_WA_CLOSER ?? "";
 
 /** Nombre del recurso que se entrega. Se interpola en el mensaje de WhatsApp. */
 export const resourceName = "sistema de canal faceless";
 
-export const outcomes: Record<
-  Tier,
-  {
-    kind: "whatsapp" | "thankyou";
-    /** Solo para kind "whatsapp". */
-    number?: string;
-    /** Línea pequeña en mayúsculas arriba del titular. */
-    eyebrow?: string;
-    title: string;
-    subtitle: string;
-    /** Segunda frase del subtítulo, en negrita. */
-    subtitleStrong?: string;
-    cta?: string;
-    /** Texto del contador. {seconds} se reemplaza por el número. */
-    countdown?: string;
-    previewLabel?: string;
-    /** Nota gris debajo de la burbuja del mensaje. */
-    previewFootnote?: string;
-    /** Nota final con candado. */
-    privacyNote?: string;
-    /** Solo para kind "thankyou". */
-    resourceUrl?: string;
-    resourceCta?: string;
-  }
-> = {
-  alto: {
-    kind: "whatsapp",
-    number: waNumbers.closer,
-    eyebrow: "Solo falta un paso",
-    title: "Abre WhatsApp",
-    subtitle: "Para enviarte el sistema de canales faceless, abre tu WhatsApp.",
-    subtitleStrong: "El mensaje ya está escrito, solo tienes que darle a enviar.",
-    cta: "Recibir los recursos por WhatsApp",
-    countdown: "Abriendo WhatsApp en {seconds} segundos...",
-    previewLabel: "Vista previa del mensaje",
-    previewFootnote: "Solamente tienes que darle a enviar en WhatsApp",
-    privacyNote: "🔒 Privacidad de datos",
-  },
-  medio: {
-    kind: "whatsapp",
-    number: waNumbers.setter,
-    eyebrow: "Solo falta un paso",
-    title: "Abre WhatsApp",
-    subtitle: "Para enviarte el sistema de canales faceless, abre tu WhatsApp.",
-    subtitleStrong: "El mensaje ya está escrito, solo tienes que darle a enviar.",
-    cta: "Recibir los recursos por WhatsApp",
-    countdown: "Abriendo WhatsApp en {seconds} segundos...",
-    previewLabel: "Vista previa del mensaje",
-    previewFootnote: "Solamente tienes que darle a enviar en WhatsApp",
-    privacyNote: "🔒 Privacidad de datos",
-  },
-  /**
-   * Los tres tiers terminan en WhatsApp con el mensaje ya escrito. Lo que
-   * cambia es a QUÉ número llega: alto va al closer, medio y bajo al setter.
-   *
-   * Si algún día quieres que el tier bajo NO llegue a WhatsApp, cambia `kind`
-   * a "thankyou" y poné el link de descarga en `resourceUrl`.
-   */
-  bajo: {
-    kind: "whatsapp",
-    number: waNumbers.setter,
-    eyebrow: "Solo falta un paso",
-    title: "Abre WhatsApp",
-    subtitle: "Para enviarte el sistema de canales faceless, abre tu WhatsApp.",
-    subtitleStrong: "El mensaje ya está escrito, solo tienes que darle a enviar.",
-    cta: "Recibir los recursos por WhatsApp",
-    countdown: "Abriendo WhatsApp en {seconds} segundos...",
-    previewLabel: "Vista previa del mensaje",
-    previewFootnote: "Solamente tienes que darle a enviar en WhatsApp",
-    privacyNote: "🔒 Privacidad de datos",
-    resourceUrl: "",
-    resourceCta: "Descargar el sistema",
-  },
-};
+/** Pantalla de WhatsApp que ve todo lead que no fue rechazado. */
+export const whatsappOutcome = {
+  eyebrow: "Solo falta un paso",
+  title: "Abre WhatsApp",
+  subtitle: "Para enviarte el sistema de canales faceless, abre tu WhatsApp.",
+  subtitleStrong: "El mensaje ya está escrito, solo tienes que darle a enviar.",
+  cta: "Recibir los recursos por WhatsApp",
+  countdown: "Abriendo WhatsApp en {seconds} segundos...",
+  previewLabel: "Vista previa del mensaje",
+  previewFootnote: "Solamente tienes que darle a enviar en WhatsApp",
+  privacyNote: "🔒 Privacidad de datos",
+} as const;
+
+/**
+ * Solo se ve si `waNumber` queda vacío (config incompleta en Vercel): sin
+ * número no hay a dónde mandarlo por WhatsApp.
+ */
+export const noWhatsAppFallback = {
+  title: "Gracias por tu interés",
+  subtitle: "Hemos recibido tus datos. En breve nos ponemos en contacto contigo.",
+  resourceUrl: "",
+  resourceCta: "Descargar el sistema",
+} as const;
 
 /** Segundos del contador antes de abrir WhatsApp solo. */
 export const whatsappAutoOpenSeconds = 10;
@@ -507,7 +452,7 @@ export const whatsappLinkStyle: "wa.me" | "api" = "wa.me";
  *
  * Alternativa en párrafo (más natural, más corta) en vez de {resumen}:
  *   "Hola, quiero el {recurso}. Soy {nombre}. Hoy {q1_estado}, puedo dedicarle
- *    {q3_tiempo} y quiero resultados {q7_urgencia}."
+ *    {q3_tiempo}."
  * Variables disponibles:
  *   {recurso}   nombre del recurso
  *   {nombre}    nombre del lead
@@ -532,7 +477,6 @@ export const summaryLabels: Record<string, string> = {
   q3_tiempo: "Horas al día",
   q4_tecnica: "Manejo del ordenador",
   q5_inversion: "Inversión disponible",
-  q7_urgencia: "Plazo",
   q8_compromiso: "Compromiso",
 };
 
@@ -563,23 +507,32 @@ export const ghlCustomFieldIds: Record<string, string> = {
   q3_tiempo: "3rhK1zqbKhUGFMWO2JQi",
   // REUSADO — "¿Tienes experiencia con el ordenador y manejo de programas?" (RADIO)
   q4_tecnica: "gFAmaTxEPGg2o7m4RQBO",
-  // REUSADO — "¿Cuánto estarías dispuesto a invertir en ti mismo...?" (RADIO)
-  q5_inversion: "fIF93MWmT8pKyJeY4WO6",
-  q7_urgencia: "kBeC26GaWJWiYsCws6jZ",
-  // REUSADO — "Solo trabajamos con personas comprometidas..." (RADIO)
+  // "Quiz - Inversión disponible" (antes reusaba un campo RADIO compartido
+  // con otra automatización; se separó para no arriesgar esa otra cosa)
+  q5_inversion: "oZOnycmGDzPNhZAyDg8k",
+  // REUSADO — "¿Eres una persona comprometida?" (RADIO)
   q8_compromiso: "xWmqNPiGd0f2Z40IHNCG",
   quiz_score: "qHcsZO6bEC5CeSEDoZ4A",
-  quiz_tier: "XAbjrV47eUfuo5QA2TbQ",
   yt_channel: "XSDRSUfE5iud1WHfjuys",
 };
 
-/** Prefijo de los tags que se mandan a GHL. */
-export const ghlTags = {
-  tierPrefix: "tier-",
-  sourcePrefix: "src-",
-  blockerPrefix: "bloqueo-",
-  base: "quiz-faceless",
-} as const;
+/** Tag que se manda a todo lead que completa el formulario. */
+export const ghlBaseTag = "organic";
+
+/**
+ * Tag extra según el `?src=` del link por el que llegó el lead, para
+ * diferenciar cuántos vienen de cada red. Usa dos links distintos:
+ *   .../?src=youtube   → tag "LMFunnelYT"
+ *   .../?src=x         → tag "LMFunnelX"
+ * Si el link trae un `src` que no está en esta lista (o no trae ninguno),
+ * el lead solo se queda con el tag "organic".
+ */
+export const ghlSourceTags: Record<string, string> = {
+  youtube: "LMFunnelYT",
+  yt: "LMFunnelYT",
+  x: "LMFunnelX",
+  twitter: "LMFunnelX",
+};
 
 /** País por defecto del selector de teléfono. */
 export const defaultPhoneCountry = "ES";

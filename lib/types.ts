@@ -1,5 +1,3 @@
-import type { Tier } from "@/config/quiz";
-
 /** Respuestas crudas: { questionId: optionId } */
 export type Answers = Record<string, string>;
 
@@ -21,10 +19,6 @@ export type LeadPayload = {
 export type ScoreResult = {
   score: number;
   maxScore: number;
-  tier: Tier;
-  /** Bloqueo principal detectado (para tag y contexto del closer). */
-  blocker: string;
-  hardFiltered: boolean;
   /** true = se le muestra la pantalla de rechazo, sin WhatsApp. */
   rejected: boolean;
 };

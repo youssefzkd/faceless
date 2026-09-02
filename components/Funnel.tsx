@@ -6,13 +6,16 @@ import Image from "next/image";
 import {
   copy,
   hardFilters,
+  heroImage,
   heroResources,
   questions,
   rejectImmediately,
   showChannelFieldWhen,
   socialProofAvatars,
+  socialProofCount,
+  socialProofCountIntervalMs,
+  socialProofCountStep,
   withCount,
-  type Tier,
 } from "@/config/quiz";
 import type { Answers, Contact } from "@/lib/types";
 import ContactStep from "./ContactStep";
@@ -25,7 +28,6 @@ import WhatsAppScreen from "./WhatsAppScreen";
 import { CheckIcon } from "./icons";
 
 type Outcome = {
-  tier: Tier;
   kind: "whatsapp" | "thankyou" | "rechazo";
   message: string;
   link: string;
@@ -50,6 +52,20 @@ export default function Funnel() {
     if (src) setSource(src.trim().slice(0, 40));
   }, [searchParams]);
 
+  // El número del pill de prueba social sube solo mientras la persona
+  // está en la página (ver socialProofCountStep / socialProofCountIntervalMs).
+  const countPrefix = socialProofCount.match(/^\D*/)?.[0] ?? "";
+  const [liveCount, setLiveCount] = useState(
+    () => parseInt(socialProofCount.replace(/\D/g, ""), 10) || 0,
+  );
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setLiveCount((prev) => prev + socialProofCountStep);
+    }, socialProofCountIntervalMs);
+    return () => clearInterval(id);
+  }, []);
+
   function selectOption(questionId: string, optionId: string) {
     setAnswers((prev) => ({ ...prev, [questionId]: optionId }));
 
@@ -59,7 +75,7 @@ export default function Funnel() {
     );
 
     if (rejectImmediately && rejects) {
-      setOutcome({ tier: "bajo", kind: "rechazo", message: "", link: "" });
+      setOutcome({ kind: "rechazo", message: "", link: "" });
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -102,13 +118,9 @@ export default function Funnel() {
     return (
       <main className="mx-auto flex w-full max-w-page flex-col px-5 pb-16 pt-14 sm:pt-20">
         {outcome.kind === "rechazo" ? (
-          <RejectionScreen />
+          <RejectionScreen onBack={() => setOutcome(null)} />
         ) : outcome.kind === "whatsapp" ? (
-          <WhatsAppScreen
-            tier={outcome.tier}
-            message={outcome.message}
-            link={outcome.link}
-          />
+          <WhatsAppScreen message={outcome.message} link={outcome.link} />
         ) : (
           <ThankYouScreen />
         )}
@@ -120,7 +132,7 @@ export default function Funnel() {
     <main className="mx-auto flex w-full max-w-page flex-col items-center px-5 pb-16 pt-10 sm:pt-14">
       <span className="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3.5 py-1.5 text-[13px] text-brand-deep">
         <Avatars />
-        {withCount(copy.socialProof)}
+        {withCount(copy.socialProof, `${countPrefix}${liveCount}`)}
       </span>
 
       <h1 className="mt-6 text-center text-[30px] font-medium leading-[1.15] tracking-tight text-ink sm:text-[38px]">
@@ -130,7 +142,18 @@ export default function Funnel() {
       </h1>
 
       <div className="mt-6 w-full sm:mt-8">
-        <HeroStack resources={heroResources} />
+        {heroImage ? (
+          <Image
+            src={heroImage.src}
+            alt={heroImage.alt}
+            width={1600}
+            height={660}
+            priority
+            className="mx-auto h-auto w-full max-w-[620px]"
+          />
+        ) : (
+          <HeroStack resources={heroResources} />
+        )}
       </div>
 
       <section className="mt-8 w-full rounded-2xl border border-hairline bg-white p-5 sm:p-7">

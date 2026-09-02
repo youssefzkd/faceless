@@ -4,14 +4,11 @@
  * Si algún día hay que cambiar de la API v2 a un inbound webhook, se edita
  * SOLO este archivo: el resto de la app únicamente llama a `sendLead()`.
  */
-import { ghlCustomFieldIds, ghlTags, questions } from "@/config/quiz";
+import { ghlBaseTag, ghlCustomFieldIds, ghlSourceTags, questions } from "@/config/quiz";
 import type { LeadPayload, ScoreResult } from "./types";
 
 const BASE_URL = "https://services.leadconnectorhq.com";
 const API_VERSION = "2021-07-28";
-
-/** Valor que devuelve el scoring cuando no hay bloqueo: no se etiqueta. */
-const NO_BLOCKER = "Sin bloqueo claro";
 
 export type SendLeadResult = {
   ok: boolean;
@@ -26,7 +23,6 @@ type CustomField = { id: string; field_value: string };
 function buildCustomFields(lead: LeadPayload, score: ScoreResult): CustomField[] {
   const values: Record<string, string> = {
     quiz_score: String(score.score),
-    quiz_tier: score.tier,
     yt_channel: lead.contact.channel?.trim() ?? "",
   };
 
@@ -44,12 +40,10 @@ function buildCustomFields(lead: LeadPayload, score: ScoreResult): CustomField[]
     .filter((field) => field.id !== "" && field.field_value !== "");
 }
 
-function buildTags(lead: LeadPayload, score: ScoreResult): string[] {
-  const tags = [ghlTags.base, `${ghlTags.tierPrefix}${score.tier}`];
-  if (lead.source) tags.push(`${ghlTags.sourcePrefix}${slug(lead.source)}`);
-  if (score.blocker && score.blocker !== NO_BLOCKER) {
-    tags.push(`${ghlTags.blockerPrefix}${slug(score.blocker)}`);
-  }
+function buildTags(lead: LeadPayload): string[] {
+  const tags = [ghlBaseTag];
+  const sourceTag = lead.source ? ghlSourceTags[slug(lead.source)] : undefined;
+  if (sourceTag) tags.push(sourceTag);
   return tags;
 }
 
@@ -73,7 +67,7 @@ function buildBody(lead: LeadPayload, score: ScoreResult, locationId: string) {
     email: lead.contact.email.trim().toLowerCase(),
     phone: lead.contact.phone, // E.164
     source: lead.source ? `quiz-${lead.source}` : "quiz-faceless",
-    tags: buildTags(lead, score),
+    tags: buildTags(lead),
     customFields: buildCustomFields(lead, score),
   };
 }
