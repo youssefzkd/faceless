@@ -118,7 +118,12 @@ export const copy = {
   },
 
   /** Bullets con check al pie de la página. {count} = socialProofCount */
-  closingBullets: ["Acceso inmediato, sin coste", "{count} personas ya lo tienen"],
+  closingBullets: [
+    "Acceso inmediato, sin coste",
+    "{count} personas ya lo tienen",
+    "Recursos que usan alumnos de Nextube",
+    "Empieza con YouTube Faceless",
+  ],
 
   /** Texto legal en letra pequeña al pie. */
   legal:
@@ -169,12 +174,17 @@ export const heroResources: Resource[] = [];
  */
 export const heroFallback = {
   /** Etiquetas de las 5 tarjetas, de izquierda a derecha. */
-  cards: ["Guion viral", "Nichos rentables", "Dashboard", "Plan 30 días", "Prompts IA"],
+  cards: [
+    "Recurso Guiones virales",
+    "Nichos rentables",
+    "Dashboard",
+    "Plan de 30 días para monetizar un canal de YouTube",
+    "Prompts IA",
+  ],
 
   /** Subtítulo opcional de una tarjeta lateral (la clave es su etiqueta). */
   side: {
     "Nichos rentables": "Base de 40",
-    "Plan 30 días": "4 semanas",
   } as Record<string, string>,
 
   /** Tarjeta central (la más grande). */
@@ -250,17 +260,17 @@ export const questions: Question[] = [
     options: [
       {
         id: "2000_3000",
-        label: "Dispongo entre 2000€-3000€",
+        label: "1000-2000+",
         ghlValue: "Dispongo entre 2000€-3000€ para invertir",
       },
       {
         id: "1000_2000",
-        label: "Dispongo entre 1000€-2000€",
+        label: "500-1000",
         ghlValue: "Dispongo entre 1000-2000€ para invertir",
       },
       {
         id: "300_500",
-        label: "Dispongo entre +300-500€",
+        label: "300-500",
         ghlValue: "Dispongo entre +300-500€ para invertir",
       },
       {
@@ -272,24 +282,13 @@ export const questions: Question[] = [
     ],
   },
   {
-    id: "q7_urgencia",
-    title: "¿Para cuándo quieres tener tu canal generando ingresos?",
-    options: [
-      { id: "30_dias", label: "En los próximos 30 días" },
-      { id: "3_meses", label: "En 3 meses" },
-      { id: "este_ano", label: "Este año" },
-      { id: "sin_prisa", label: "No tengo prisa" },
-    ],
-  },
-  {
     id: "q8_compromiso",
-    title:
-      "Solo trabajamos con personas comprometidas. ¿Puedes garantizar que asistirás a la llamada en la fecha y hora que elijas, en un sitio adecuado? (ni en el coche, ni en la calle)",
+    title: "¿Eres una persona comprometida?",
     options: [
       { id: "si", label: "Sí, me comprometo al 100%", ghlValue: "Si, me comprometo al 100%" },
       {
         id: "no",
-        label: "No puedo comprometerme a asistir",
+        label: "No soy una persona comprometida",
         ghlValue: "No puedo comprometerme a asistir",
       },
     ],
@@ -312,7 +311,6 @@ export const showChannelFieldWhen = {
  * Sube o baja los números para cambiar a quién califica el embudo.
  *
  * Peso alto:  q5 (presupuesto) y q3 (tiempo)  → hasta 30 pts
- * Peso medio: q7 (urgencia)                   → hasta 15 pts
  * Peso bajo:  q1, q2                          → hasta 8 pts
  */
 export const scoreWeights: Record<string, Record<string, number>> = {
@@ -345,12 +343,6 @@ export const scoreWeights: Record<string, Record<string, number>> = {
     "1000_2000": 24,
     "300_500": 10,
     menos_250: 0,
-  },
-  q7_urgencia: {
-    "30_dias": 15,
-    "3_meses": 11,
-    este_ano: 5,
-    sin_prisa: 0,
   },
   q8_compromiso: {
     si: 10,
@@ -406,7 +398,7 @@ export const rejectionScreen = {
 } as const;
 
 /**
- * Umbrales de puntaje. Puntaje máximo posible: 111.
+ * Umbrales de puntaje. Puntaje máximo posible: 96.
  *  >= alto  → tier alto
  *  >= medio → tier medio
  *  resto    → tier bajo
@@ -521,7 +513,7 @@ export const whatsappLinkStyle: "wa.me" | "api" = "wa.me";
  *
  * Alternativa en párrafo (más natural, más corta) en vez de {resumen}:
  *   "Hola, quiero el {recurso}. Soy {nombre}. Hoy {q1_estado}, puedo dedicarle
- *    {q3_tiempo} y quiero resultados {q7_urgencia}."
+ *    {q3_tiempo}."
  * Variables disponibles:
  *   {recurso}   nombre del recurso
  *   {nombre}    nombre del lead
@@ -546,7 +538,6 @@ export const summaryLabels: Record<string, string> = {
   q3_tiempo: "Horas al día",
   q4_tecnica: "Manejo del ordenador",
   q5_inversion: "Inversión disponible",
-  q7_urgencia: "Plazo",
   q8_compromiso: "Compromiso",
 };
 
@@ -579,21 +570,30 @@ export const ghlCustomFieldIds: Record<string, string> = {
   q4_tecnica: "gFAmaTxEPGg2o7m4RQBO",
   // REUSADO — "¿Cuánto estarías dispuesto a invertir en ti mismo...?" (RADIO)
   q5_inversion: "fIF93MWmT8pKyJeY4WO6",
-  q7_urgencia: "kBeC26GaWJWiYsCws6jZ",
-  // REUSADO — "Solo trabajamos con personas comprometidas..." (RADIO)
+  // REUSADO — "¿Eres una persona comprometida?" (RADIO)
   q8_compromiso: "xWmqNPiGd0f2Z40IHNCG",
   quiz_score: "qHcsZO6bEC5CeSEDoZ4A",
   quiz_tier: "XAbjrV47eUfuo5QA2TbQ",
   yt_channel: "XSDRSUfE5iud1WHfjuys",
 };
 
-/** Prefijo de los tags que se mandan a GHL. */
-export const ghlTags = {
-  tierPrefix: "tier-",
-  sourcePrefix: "src-",
-  blockerPrefix: "bloqueo-",
-  base: "quiz-faceless",
-} as const;
+/** Tag que se manda a todo lead que completa el formulario. */
+export const ghlBaseTag = "organic";
+
+/**
+ * Tag extra según el `?src=` del link por el que llegó el lead, para
+ * diferenciar cuántos vienen de cada red. Usa dos links distintos:
+ *   .../?src=youtube   → tag "LMFunnelYT"
+ *   .../?src=x         → tag "LMFunnelX"
+ * Si el link trae un `src` que no está en esta lista (o no trae ninguno),
+ * el lead solo se queda con el tag "organic".
+ */
+export const ghlSourceTags: Record<string, string> = {
+  youtube: "LMFunnelYT",
+  yt: "LMFunnelYT",
+  x: "LMFunnelX",
+  twitter: "LMFunnelX",
+};
 
 /** País por defecto del selector de teléfono. */
 export const defaultPhoneCountry = "ES";
