@@ -15,7 +15,6 @@ import {
   socialProofCountIntervalMs,
   socialProofCountStep,
   withCount,
-  type Tier,
 } from "@/config/quiz";
 import type { Answers, Contact } from "@/lib/types";
 import ContactStep from "./ContactStep";
@@ -28,7 +27,6 @@ import WhatsAppScreen from "./WhatsAppScreen";
 import { CheckIcon } from "./icons";
 
 type Outcome = {
-  tier: Tier;
   kind: "whatsapp" | "thankyou" | "rechazo";
   message: string;
   link: string;
@@ -76,7 +74,7 @@ export default function Funnel() {
     );
 
     if (rejectImmediately && rejects) {
-      setOutcome({ tier: "bajo", kind: "rechazo", message: "", link: "" });
+      setOutcome({ kind: "rechazo", message: "", link: "" });
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -121,11 +119,7 @@ export default function Funnel() {
         {outcome.kind === "rechazo" ? (
           <RejectionScreen onBack={() => setOutcome(null)} />
         ) : outcome.kind === "whatsapp" ? (
-          <WhatsAppScreen
-            tier={outcome.tier}
-            message={outcome.message}
-            link={outcome.link}
-          />
+          <WhatsAppScreen message={outcome.message} link={outcome.link} />
         ) : (
           <ThankYouScreen />
         )}

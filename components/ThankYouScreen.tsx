@@ -1,7 +1,7 @@
-import { outcomes } from "@/config/quiz";
+import { noWhatsAppFallback } from "@/config/quiz";
 
 export default function ThankYouScreen() {
-  const outcome = outcomes.bajo;
+  const outcome = noWhatsAppFallback;
 
   return (
     <div className="step-in text-center">

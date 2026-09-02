@@ -1,17 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { outcomes, whatsappAutoOpenSeconds, type Tier } from "@/config/quiz";
+import { whatsappAutoOpenSeconds, whatsappOutcome } from "@/config/quiz";
 import { WhatsAppIcon } from "./icons";
 
 type Props = {
-  tier: Tier;
   message: string;
   link: string;
 };
 
-export default function WhatsAppScreen({ tier, message, link }: Props) {
-  const outcome = outcomes[tier];
+export default function WhatsAppScreen({ message, link }: Props) {
+  const outcome = whatsappOutcome;
   const [seconds, setSeconds] = useState(whatsappAutoOpenSeconds);
   const [opened, setOpened] = useState(false);
 

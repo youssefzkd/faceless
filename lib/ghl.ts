@@ -23,7 +23,6 @@ type CustomField = { id: string; field_value: string };
 function buildCustomFields(lead: LeadPayload, score: ScoreResult): CustomField[] {
   const values: Record<string, string> = {
     quiz_score: String(score.score),
-    quiz_tier: score.tier,
     yt_channel: lead.contact.channel?.trim() ?? "",
   };
 

@@ -18,8 +18,6 @@
 
 /* ---------------------------------------------------------------- tipos --- */
 
-export type Tier = "alto" | "medio" | "bajo";
-
 export type QuestionOption = {
   /** No cambiar nunca. Se usa en puntajes y en GoHighLevel. */
   id: string;
@@ -260,18 +258,18 @@ export const questions: Question[] = [
     options: [
       {
         id: "2000_3000",
-        label: "1000-2000+",
-        ghlValue: "Dispongo entre 2000€-3000€ para invertir",
+        label: "1000-2000+€",
+        ghlValue: "1000-2000+€",
       },
       {
         id: "1000_2000",
-        label: "500-1000",
-        ghlValue: "Dispongo entre 1000-2000€ para invertir",
+        label: "500-1000€",
+        ghlValue: "500-1000€",
       },
       {
         id: "300_500",
-        label: "300-500",
-        ghlValue: "Dispongo entre +300-500€ para invertir",
+        label: "300-500€",
+        ghlValue: "300-500€",
       },
       {
         id: "menos_250",
@@ -351,17 +349,16 @@ export const scoreWeights: Record<string, Record<string, number>> = {
 };
 
 /**
- * Filtros duros: si el usuario elige una de estas opciones, el tier baja a
- * "bajo" sin importar el puntaje total.
+ * Filtros duros: respuestas que marcan al lead como problemático. Solo
+ * cortan el paso (pantalla de rechazo, sin WhatsApp) si llevan
+ * `reject: true`; el resto quedan solo como dato (`reason`), sin efecto en
+ * el flujo — hoy no hay ninguno así, pero queda listo por si hace falta.
  */
 export const hardFilters: {
   questionId: string;
   optionId: string;
   reason: string;
-  /**
-   * true = además de bajar a tier bajo, se le muestra la pantalla de rechazo
-   * y NO se le da acceso a WhatsApp.
-   */
+  /** true = se le muestra la pantalla de rechazo y NO se le da acceso a WhatsApp. */
   reject?: boolean;
 }[] = [
   {
@@ -382,7 +379,7 @@ export const hardFilters: {
  *  true  → apenas elige esa opción ve la pantalla de rechazo. No se le piden
  *          los datos ni llega a GoHighLevel.
  *  false → termina el formulario y recién ahí ve el rechazo (el contacto sí
- *          queda registrado en GoHighLevel, con su tag de bloqueo).
+ *          queda registrado en GoHighLevel).
  */
 export const rejectImmediately = true;
 
@@ -397,101 +394,44 @@ export const rejectionScreen = {
     "Únicamente trabajamos con personas comprometidas. Si más adelante puedes comprometerte de verdad, vuelve a rellenar el formulario y lo vemos.",
 } as const;
 
+/* ------------------------------------------------ destino de todo lead --- */
+
 /**
- * Umbrales de puntaje. Puntaje máximo posible: 96.
- *  >= alto  → tier alto
- *  >= medio → tier medio
- *  resto    → tier bajo
+ * Ya no se reparte por tier: todo lead que pasa el quiz (y no cae en un
+ * filtro con `reject: true`) va al mismo número. Calificáis a mano por
+ * WhatsApp, así que aquí no hace falta distinguir closer/setter.
+ *
+ * `NEXT_PUBLIC_WA_SETTER` quedó sin usar — puedes borrarla de Vercel cuando
+ * quieras, no rompe nada si se queda.
  */
-export const tierThresholds = {
-  alto: 82,
-  medio: 51,
-} as const;
-
-/* --------------------------------------------------- destino según tier --- */
-
-export const waNumbers = {
-  closer: process.env.NEXT_PUBLIC_WA_CLOSER ?? "",
-  setter: process.env.NEXT_PUBLIC_WA_SETTER ?? "",
-} as const;
+export const waNumber = process.env.NEXT_PUBLIC_WA_CLOSER ?? "";
 
 /** Nombre del recurso que se entrega. Se interpola en el mensaje de WhatsApp. */
 export const resourceName = "sistema de canal faceless";
 
-export const outcomes: Record<
-  Tier,
-  {
-    kind: "whatsapp" | "thankyou";
-    /** Solo para kind "whatsapp". */
-    number?: string;
-    /** Línea pequeña en mayúsculas arriba del titular. */
-    eyebrow?: string;
-    title: string;
-    subtitle: string;
-    /** Segunda frase del subtítulo, en negrita. */
-    subtitleStrong?: string;
-    cta?: string;
-    /** Texto del contador. {seconds} se reemplaza por el número. */
-    countdown?: string;
-    previewLabel?: string;
-    /** Nota gris debajo de la burbuja del mensaje. */
-    previewFootnote?: string;
-    /** Nota final con candado. */
-    privacyNote?: string;
-    /** Solo para kind "thankyou". */
-    resourceUrl?: string;
-    resourceCta?: string;
-  }
-> = {
-  alto: {
-    kind: "whatsapp",
-    number: waNumbers.closer,
-    eyebrow: "Solo falta un paso",
-    title: "Abre WhatsApp",
-    subtitle: "Para enviarte el sistema de canales faceless, abre tu WhatsApp.",
-    subtitleStrong: "El mensaje ya está escrito, solo tienes que darle a enviar.",
-    cta: "Recibir los recursos por WhatsApp",
-    countdown: "Abriendo WhatsApp en {seconds} segundos...",
-    previewLabel: "Vista previa del mensaje",
-    previewFootnote: "Solamente tienes que darle a enviar en WhatsApp",
-    privacyNote: "🔒 Privacidad de datos",
-  },
-  medio: {
-    kind: "whatsapp",
-    number: waNumbers.setter,
-    eyebrow: "Solo falta un paso",
-    title: "Abre WhatsApp",
-    subtitle: "Para enviarte el sistema de canales faceless, abre tu WhatsApp.",
-    subtitleStrong: "El mensaje ya está escrito, solo tienes que darle a enviar.",
-    cta: "Recibir los recursos por WhatsApp",
-    countdown: "Abriendo WhatsApp en {seconds} segundos...",
-    previewLabel: "Vista previa del mensaje",
-    previewFootnote: "Solamente tienes que darle a enviar en WhatsApp",
-    privacyNote: "🔒 Privacidad de datos",
-  },
-  /**
-   * Los tres tiers terminan en WhatsApp con el mensaje ya escrito. Lo que
-   * cambia es a QUÉ número llega: alto va al closer, medio y bajo al setter.
-   *
-   * Si algún día quieres que el tier bajo NO llegue a WhatsApp, cambia `kind`
-   * a "thankyou" y poné el link de descarga en `resourceUrl`.
-   */
-  bajo: {
-    kind: "whatsapp",
-    number: waNumbers.setter,
-    eyebrow: "Solo falta un paso",
-    title: "Abre WhatsApp",
-    subtitle: "Para enviarte el sistema de canales faceless, abre tu WhatsApp.",
-    subtitleStrong: "El mensaje ya está escrito, solo tienes que darle a enviar.",
-    cta: "Recibir los recursos por WhatsApp",
-    countdown: "Abriendo WhatsApp en {seconds} segundos...",
-    previewLabel: "Vista previa del mensaje",
-    previewFootnote: "Solamente tienes que darle a enviar en WhatsApp",
-    privacyNote: "🔒 Privacidad de datos",
-    resourceUrl: "",
-    resourceCta: "Descargar el sistema",
-  },
-};
+/** Pantalla de WhatsApp que ve todo lead que no fue rechazado. */
+export const whatsappOutcome = {
+  eyebrow: "Solo falta un paso",
+  title: "Abre WhatsApp",
+  subtitle: "Para enviarte el sistema de canales faceless, abre tu WhatsApp.",
+  subtitleStrong: "El mensaje ya está escrito, solo tienes que darle a enviar.",
+  cta: "Recibir los recursos por WhatsApp",
+  countdown: "Abriendo WhatsApp en {seconds} segundos...",
+  previewLabel: "Vista previa del mensaje",
+  previewFootnote: "Solamente tienes que darle a enviar en WhatsApp",
+  privacyNote: "🔒 Privacidad de datos",
+} as const;
+
+/**
+ * Solo se ve si `waNumber` queda vacío (config incompleta en Vercel): sin
+ * número no hay a dónde mandarlo por WhatsApp.
+ */
+export const noWhatsAppFallback = {
+  title: "Gracias por tu interés",
+  subtitle: "Hemos recibido tus datos. En breve nos ponemos en contacto contigo.",
+  resourceUrl: "",
+  resourceCta: "Descargar el sistema",
+} as const;
 
 /** Segundos del contador antes de abrir WhatsApp solo. */
 export const whatsappAutoOpenSeconds = 10;
@@ -573,7 +513,6 @@ export const ghlCustomFieldIds: Record<string, string> = {
   // REUSADO — "¿Eres una persona comprometida?" (RADIO)
   q8_compromiso: "xWmqNPiGd0f2Z40IHNCG",
   quiz_score: "qHcsZO6bEC5CeSEDoZ4A",
-  quiz_tier: "XAbjrV47eUfuo5QA2TbQ",
   yt_channel: "XSDRSUfE5iud1WHfjuys",
 };
 

@@ -1,8 +1,9 @@
 # Quiz de cualificación — Canal Faceless
 
-Landing de una sola página con quiz de 8 preguntas que califica al lead en el
-servidor y lo enruta a WhatsApp (closer o setter) o a una pantalla de
-agradecimiento. Los leads se envían a **GoHighLevel**. No hay base de datos.
+Landing de una sola página con quiz de 6 preguntas que califica al lead en el
+servidor y lo manda a WhatsApp con el mensaje ya escrito (la calificación fina
+se hace a mano, por WhatsApp). Los leads se envían a **GoHighLevel**. No hay
+base de datos.
 
 - Next.js 14 (App Router) + TypeScript + Tailwind
 - Deploy en Vercel
@@ -29,12 +30,10 @@ Con `GHL_ENABLED=false` (el valor por defecto) el formulario funciona completo,
 pero en vez de enviar nada a GoHighLevel imprime en la terminal el payload que
 habría mandado. Así se puede desarrollar sin credenciales.
 
-Para probar el enrutamiento por tier necesitas al menos los dos números de
-WhatsApp en `.env.local`:
+Para probar el botón de WhatsApp necesitas el número en `.env.local`:
 
 ```
 NEXT_PUBLIC_WA_CLOSER=5215512345678
-NEXT_PUBLIC_WA_SETTER=5215587654321
 ```
 
 (formato internacional, sin `+`, sin espacios, sin guiones)
@@ -48,12 +47,10 @@ NEXT_PUBLIC_WA_SETTER=5215587654321
 | `GHL_PIT` | Private Integration Token de GoHighLevel. **Secreto.** | `pit-xxxx...` |
 | `GHL_LOCATION_ID` | ID de la sub-cuenta (location) de GHL | `abc123...` |
 | `GHL_ENABLED` | `true` para enviar de verdad, `false` para solo loguear | `false` |
-| `NEXT_PUBLIC_WA_CLOSER` | WhatsApp del closer (leads tier **alto**) | `522213454952` |
-| `NEXT_PUBLIC_WA_SETTER` | WhatsApp del setter (tier **medio** y **bajo**) | `522213454952` |
+| `NEXT_PUBLIC_WA_CLOSER` | WhatsApp al que llega todo lead que completa el quiz | `522213454952` |
 
-> Hoy las dos apuntan al mismo número (el del setter), porque todavía no hay
-> uno de closer. Cuando lo haya, se cambia `NEXT_PUBLIC_WA_CLOSER` en Vercel y
-> los leads tier alto empiezan a caer ahí solos. No hay que tocar código.
+> `NEXT_PUBLIC_WA_SETTER` ya no se usa (antes servía para repartir por tier).
+> Puedes borrarla de Vercel cuando quieras, no rompe nada si se queda.
 
 > El token **nunca** lleva el prefijo `NEXT_PUBLIC_`. Todo lo que lleva ese
 > prefijo queda visible en el navegador de cualquier visitante.
@@ -62,7 +59,7 @@ NEXT_PUBLIC_WA_SETTER=5215587654321
 
 1. Entra a tu proyecto en [vercel.com](https://vercel.com)
 2. **Settings → Environment Variables**
-3. Agrega una por una las 5 variables de la tabla, marcando los entornos
+3. Agrega una por una las 4 variables de la tabla, marcando los entornos
    **Production**, **Preview** y **Development**
 4. **Deployments → ⋯ → Redeploy** (las variables solo aplican en deploys nuevos)
 
@@ -87,7 +84,7 @@ Lo que hace:
 
 1. Valida el token con una llamada de lectura a tu location
 2. Lista los custom fields que ya existen
-3. Crea los que falten (uno por cada pregunta + puntaje + tier + canal)
+3. Crea los que falten (uno por cada pregunta + puntaje + canal)
 4. Imprime un bloque `ghlCustomFieldIds` listo para copiar
 
 Copia ese bloque y reemplaza con él el `ghlCustomFieldIds` que está al final de
@@ -95,7 +92,7 @@ Copia ese bloque y reemplaza con él el `ghlCustomFieldIds` que está al final d
 simplemente no se envían, así que nada se rompe si lo dejas a medias.
 
 Solo hace falta correrlo una vez, o cuando agregues preguntas nuevas. **Ya está
-corrido** contra la cuenta "Mario YT": los 11 ids están puestos en la config.
+corrido** contra la cuenta "Mario YT": los ids están puestos en la config.
 
 ### Campos reusados de la cuenta
 
@@ -107,7 +104,7 @@ siguen funcionando:
 | --- | --- | --- |
 | Q4 · manejo del ordenador | *¿Tienes experiencia con el ordenador y manejo de programas?* | RADIO |
 | Q5 · inversión | *¿Cuánto estarías dispuesto a invertir en ti mismo...?* | RADIO |
-| Q8 · compromiso | *Solo trabajamos con personas comprometidas...* | RADIO |
+| Q8 · compromiso | *¿Eres una persona comprometida?* | RADIO |
 
 Los campos RADIO de GoHighLevel **solo aceptan sus propias opciones, escritas
 tal cual** (con sus tildes y sus rarezas). Por eso esas tres preguntas tienen un
@@ -122,7 +119,7 @@ tal cual** (con sus tildes y sus rarezas). Por eso esas tres preguntas tienen un
 > cambies también la opción dentro de GoHighLevel. Si no coinciden, GHL
 > descarta el dato en silencio.
 
-Las otras 8 preguntas usan campos nuevos con el prefijo `Quiz - `.
+Las otras 3 preguntas usan campos nuevos con el prefijo `Quiz - `.
 
 ---
 
@@ -190,11 +187,12 @@ metric: { label: "Ingresos del mes", value: "$6.240" },
 todos en el bloque `copy`, cerca del principio del archivo.
 
 **Cambiar los puntajes** — en el bloque `scoreWeights`. Cada opción tiene un
-número: más alto = lead más calificado. Y en `tierThresholds` decides desde qué
-puntaje alguien es `alto` o `medio`.
+número: más alto = lead más calificado. El puntaje solo se guarda como dato de
+referencia (`Quiz - Puntaje` en GHL); no cambia a dónde va el lead — eso se
+califica a mano por WhatsApp.
 
-**Cambiar los números de WhatsApp** — esos NO están en este archivo, están en
-las variables de entorno de Vercel (ver la sección de arriba).
+**Cambiar el número de WhatsApp** — eso NO está en este archivo, está en las
+variables de entorno de Vercel (ver la sección de arriba).
 
 ### Reglas para no romper nada
 
@@ -218,7 +216,7 @@ las variables de entorno de Vercel (ver la sección de arriba).
 | [`components/Funnel.tsx`](components/Funnel.tsx) | Orquesta los pasos: preguntas → datos → resultado |
 | [`components/HeroStack.tsx`](components/HeroStack.tsx) | Abanico de 5 tarjetas del hero |
 | [`app/api/lead/route.ts`](app/api/lead/route.ts) | Recibe las respuestas, **calcula el scoring en el servidor** y decide el destino |
-| [`lib/scoring.ts`](lib/scoring.ts) | Puntaje, filtros duros y tier |
+| [`lib/scoring.ts`](lib/scoring.ts) | Puntaje y filtros duros (quién queda rechazado) |
 | [`lib/ghl.ts`](lib/ghl.ts) | **Único** punto de contacto con GoHighLevel |
 | [`lib/whatsapp.ts`](lib/whatsapp.ts) | Arma el mensaje y el link de WhatsApp en runtime |
 | [`scripts/ghl-setup.ts`](scripts/ghl-setup.ts) | Crea los custom fields en GHL |
@@ -226,13 +224,15 @@ las variables de entorno de Vercel (ver la sección de arriba).
 Notas de diseño:
 
 - **El scoring nunca corre en el cliente.** El navegador manda solo respuestas
-  crudas; el tier y el número de WhatsApp los decide el servidor.
+  crudas; el puntaje y el link de WhatsApp los arma el servidor.
 - **El link de WhatsApp se arma en runtime**, no hay links pre-hechos.
 - Si el envío a GHL falla, el lead **igual** ve su pantalla de resultado (el
   error queda en los logs). Se prioriza no perder la conversación.
 - El progreso del quiz vive en estado de React, no en `localStorage`.
-- El parámetro `?src=` (ej: `?src=youtube`) se captura al montar y viaja como
-  tag a GoHighLevel.
+- El parámetro `?src=` (ej: `?src=youtube`) se captura al montar y decide el
+  tag que se manda a GoHighLevel: todo lead recibe el tag `organic`, y si el
+  link trae `?src=youtube` o `?src=x` se le suma `LMFunnelYT` o `LMFunnelX`
+  para diferenciar de dónde vino (ver `ghlSourceTags` en `config/quiz.ts`).
 
 ### Sobre los links de WhatsApp
 
@@ -243,8 +243,8 @@ construye solo, en el servidor, cada vez que alguien termina el quiz:
 https://wa.me/NUMERO?text=<mensaje con las respuestas ya escritas>
 ```
 
-- El número sale de `NEXT_PUBLIC_WA_CLOSER` / `NEXT_PUBLIC_WA_SETTER` según el
-  tier, así que se cambia desde Vercel sin tocar código.
+- El número sale de `NEXT_PUBLIC_WA_CLOSER`, así que se cambia desde Vercel
+  sin tocar código.
 - El texto sale de `whatsappTemplate` en [`config/quiz.ts`](config/quiz.ts).
 - `wa.me` y `api.whatsapp.com/send` hacen exactamente lo mismo (el primero
   redirige al segundo). Si algún navegador te da problemas, cambia

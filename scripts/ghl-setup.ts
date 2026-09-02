@@ -3,7 +3,7 @@
  *
  *   1. Valida el token con una llamada de lectura
  *   2. Lista los custom fields existentes
- *   3. Crea los que falten (uno por pregunta + score + tier + canal)
+ *   3. Crea los que falten (uno por pregunta + score + canal)
  *   4. Imprime el mapa de IDs listo para pegar en config/quiz.ts
  *
  * Uso:  npm run ghl:setup      (lee GHL_PIT y GHL_LOCATION_ID de .env)
@@ -30,7 +30,6 @@ const REQUIRED_FIELDS: { key: string; name: string }[] = [
     name: `Quiz - ${summaryLabels[q.id] ?? q.title}`.slice(0, 60),
   })),
   { key: "quiz_score", name: "Quiz - Puntaje" },
-  { key: "quiz_tier", name: "Quiz - Tier" },
   { key: "yt_channel", name: "Quiz - Canal de YouTube" },
 ];
 
